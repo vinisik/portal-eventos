@@ -1,0 +1,20 @@
+# --- .NET / C# ---
+bin/
+obj/
+*.db
+*.db-journal
+*.user
+.vs/
+.vscode/
+
+# --- Node / React ---
+node_modules/
+dist/
+build/
+.env
+.eslintcache
+npm-debug.log*
+
+# --- Sistema ---
+.DS_Store
+Thumbs.db

@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortalEventos.Api", "PortalEventos.Api.csproj", "{0B65A506-C8A8-61D7-A4A3-760913019B39}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0B65A506-C8A8-61D7-A4A3-760913019B39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B65A506-C8A8-61D7-A4A3-760913019B39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B65A506-C8A8-61D7-A4A3-760913019B39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B65A506-C8A8-61D7-A4A3-760913019B39}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7C854E00-746F-4C9E-8797-C4FAA95A5417}
+	EndGlobalSection
+EndGlobal
