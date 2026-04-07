@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using PortalEventos.Api.Data;
 using System.Text;
 using System.Text.Json.Serialization;
+using PortalEventos.Api.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -58,5 +59,30 @@ app.UseAuthorization();  // Verifica se ele tem permissão
 
 app.UseAuthorization();
 app.MapControllers();
+
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<AppDbContext>();
+
+    // Verifica se já existe algum usuário Admin
+    if (!context.Usuarios.Any(u => u.Perfil == "Admin"))
+    {
+        var admin = new Usuario
+        {
+            // Cria um superusuário admin com email e senha padrão para desenvolvimento
+            Nome = "Administrador",
+            Email = "admin@portal.com",
+            // Gera o hash seguro da senha 'admin123'
+            SenhaHash = BCrypt.Net.BCrypt.HashPassword("admin123"),
+            Perfil = "Admin"
+        };
+
+        context.Usuarios.Add(admin);
+        context.SaveChanges();
+        Console.WriteLine("--> Superuser criado com sucesso: admin@portal.com / admin123");
+    }
+}
 
 app.Run();

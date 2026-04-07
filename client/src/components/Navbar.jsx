@@ -36,6 +36,9 @@ export default function Navbar() {
                     <Link to="/admin/novo" className="text-sm font-bold text-blue-600 hover:text-blue-700">
                       + Criar Evento
                     </Link>
+                    <Link to="/admin/usuarios" className="text-sm font-bold text-blue-600 hover:text-blue-700">
+                      Gerenciar Usuários
+                    </Link>
                   </div>
                 )}
 

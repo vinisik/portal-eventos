@@ -58,7 +58,7 @@ export default function ListaEventos() {
   return (
     <div className="pb-10">
       <div className="flex justify-between items-center mb-8">
-        <h2 className="text-3xl font-extrabold text-gray-900">Próximos Eventos</h2>
+        <h2 className="text-3xl font-extrabold text-gray-900">Eventos Disponíveis</h2>
         {isAdmin && (
           <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
             Modo Administrador

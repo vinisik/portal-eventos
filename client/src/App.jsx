@@ -8,6 +8,7 @@ import Registro from './pages/Registro';
 import NovoEvento from './pages/NovoEvento';
 import EditarEvento from './pages/EditarEvento';
 import ListaParticipantes from './pages/ListaParticipantes';
+import AdminUsuarios from './pages/AdminUsuarios';
 
 const AdminRoute = ({ children }) => {
   const role = localStorage.getItem('roleUser');
@@ -55,6 +56,15 @@ export default function App() {
             element={
               <AdminRoute>
                 <ListaParticipantes />
+              </AdminRoute>
+            } 
+          />
+
+          <Route 
+            path="/admin/usuarios" 
+            element={
+              <AdminRoute>
+                <AdminUsuarios />
               </AdminRoute>
             } 
           />
