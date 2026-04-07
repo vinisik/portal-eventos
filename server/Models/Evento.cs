@@ -7,6 +7,7 @@ namespace PortalEventos.Api.Models
         public string Descricao { get; set; } = string.Empty;
         public DateTime Data { get; set; }
         public int CapacidadeMaxima { get; set; }
+        public int IdadeMinima { get; set; }
 
         // Propriedade de navegação um evento tem vários participantes
         public List<Participante> Participantes { get; set; } = new();

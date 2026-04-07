@@ -95,6 +95,17 @@ export default function ListaEventos() {
                     <span className="bg-gray-100 p-1.5 rounded mr-3">🎟️</span>
                     <span>Capacidade: <span className="font-semibold text-gray-700">{evento.capacidadeMaxima} pessoas</span></span>
                   </div>
+                  <div className="flex items-center text-sm font-bold mt-2">
+                    {evento.idadeMinima === 0 ? (
+                      <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs">
+                        ✅ Classificação Livre
+                      </span>
+                    ) : (
+                      <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs">
+                        🔞 +{evento.idadeMinima} Anos
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
 

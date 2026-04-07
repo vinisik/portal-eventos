@@ -11,7 +11,8 @@ export default function NovoEvento() {
         titulo: '',
         descricao: '',
         data: '',
-        capacidadeMaxima: ''
+        capacidadeMaxima: '',
+        idadMinima: 0
     });
 
     // Atualiza o estado enquanto o usuário digita
@@ -29,7 +30,8 @@ export default function NovoEvento() {
                 titulo: formData.titulo,
                 descricao: formData.descricao,
                 data: formData.data,
-                capacidadeMaxima: parseInt(formData.capacidadeMaxima) 
+                capacidadeMaxima: parseInt(formData.capacidadeMaxima) ,
+                idadeMinima: parseInt(formData.idadeMinima)
             });
 
             alert('Evento criado com sucesso!');
@@ -86,6 +88,20 @@ export default function NovoEvento() {
                             className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 outline-none transition"
                             placeholder="Ex: 100"
                         />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Classificação (Idade)</label>
+                        <select
+                            required name="idadeMinima"
+                            value={formData.idadeMinima} onChange={handleChange}
+                            className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 outline-none transition bg-white"
+                        >
+                            <option value="0">✅ Livre para todos</option>
+                            <option value="14">🔞 Maiores de 14 anos</option>
+                            <option value="16">🔞 Maiores de 16 anos</option>
+                            <option value="18">🔞 Maiores de 18 anos</option>
+                        </select>
                     </div>
                 </div>
 

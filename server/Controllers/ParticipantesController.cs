@@ -28,6 +28,25 @@ namespace PortalEventos.Api.Controllers
             var totalInscritos = await _context.Participantes.CountAsync(p => p.EventoId == participante.EventoId);
             if (totalInscritos >= evento.CapacidadeMaxima) return BadRequest("As vagas para este evento estão esgotadas.");
 
+            if (evento.IdadeMinima > 0) 
+            {
+                var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.Email == participante.Email);
+                
+                if (usuario == null) 
+                    return BadRequest($"A idade mínima para este evento é de {evento.IdadeMinima} anos. Crie uma conta no portal.");
+
+                // Cálculo dinâmico da idade baseado na DataNascimento
+                var hoje = DateTime.Today;
+                var idadeCalculada = hoje.Year - usuario.DataNascimento.Year;
+                
+                // Se a pessoa ainda não fez aniversário este ano, subtrai 1 da idade
+                if (usuario.DataNascimento.Date > hoje.AddYears(-idadeCalculada)) 
+                    idadeCalculada--;
+
+                if (idadeCalculada < evento.IdadeMinima)
+                    return BadRequest($"Idade insuficiente. Você tem {idadeCalculada} anos, mas o evento exige {evento.IdadeMinima} anos.");
+            }
+
             // Salva a inscrição no banco
             _context.Participantes.Add(participante);
             await _context.SaveChangesAsync();

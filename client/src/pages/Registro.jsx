@@ -6,6 +6,7 @@ export default function Registro() {
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
+  const [dataNascimento, setDataNascimento] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -14,7 +15,7 @@ export default function Registro() {
     setLoading(true);
     try {
       // Chamada para o AuthController.cs 
-      await api.post('/auth/registrar', { nome, email, senha });
+      await api.post('/auth/registrar', { nome, email, senha, dataNascimento });
       
       alert("Conta criada com sucesso! Agora você pode fazer login.");
       navigate('/login'); // Redireciona para o login
@@ -49,6 +50,15 @@ export default function Registro() {
             type="email" placeholder="seu@email.com" 
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all"
             value={email} onChange={(e) => setEmail(e.target.value)} required
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Data de Nascimento</label>
+          <input 
+            type="date" required 
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+            value={dataNascimento} onChange={(e) => setDataNascimento(e.target.value)}
           />
         </div>
 

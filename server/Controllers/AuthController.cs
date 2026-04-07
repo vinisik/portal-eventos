@@ -39,7 +39,8 @@ public class AuthController : ControllerBase
             Email = request.Email,
             // Criptografa a senha antes de salvar no SQLite
             SenhaHash = BCrypt.Net.BCrypt.HashPassword(request.Senha),
-            Perfil = "Comum" 
+            Perfil = "Comum",
+            DataNascimento = request.DataNascimento
         };
 
         _context.Usuarios.Add(usuario);
@@ -114,5 +115,5 @@ public class AuthController : ControllerBase
     }
 }
 
-public record UsuarioDTO(string Nome, string Email, string Senha);
+public record UsuarioDTO(string Nome, string Email, string Senha, DateTime DataNascimento);
 public record LoginDTO(string Email, string Senha);
