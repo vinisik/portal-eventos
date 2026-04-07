@@ -9,6 +9,7 @@ import NovoEvento from './pages/NovoEvento';
 import EditarEvento from './pages/EditarEvento';
 import ListaParticipantes from './pages/ListaParticipantes';
 import AdminUsuarios from './pages/AdminUsuarios';
+import DetalhesEvento from './pages/DetalhesEvento';
 
 const AdminRoute = ({ children }) => {
   const role = localStorage.getItem('roleUser');
@@ -31,6 +32,7 @@ export default function App() {
           <Route path="/" element={<ListaEventos />} />
           <Route path="/evento/:id/inscricao" element={<Inscricao />} />
           <Route path="/ticket/:hash" element={<VisualizarIngresso />} />
+          <Route path="/evento/:id" element={<DetalhesEvento />} />
           
           <Route path="/login" element={<Login />} />
           <Route path="/registrar" element={<Registro />} />

@@ -15,7 +15,6 @@ export default function ListaEventos() {
 
   const buscarEventos = async () => {
     try {
-      // GET 
       const response = await axios.get('http://localhost:5065/api/eventos');
       setEventos(response.data);
     } catch (error) {
@@ -78,72 +77,84 @@ export default function ListaEventos() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {eventos.map((evento) => (
-            <div key={evento.id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col hover:shadow-lg transition-shadow duration-300">
+            <div key={evento.id} className="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col hover:shadow-lg transition-shadow duration-300 overflow-hidden">
               
-              <div className="flex-grow">
-                <h3 className="text-xl font-bold text-gray-800 mb-2">{evento.titulo}</h3>
-                <p className="text-gray-600 text-sm mb-6 line-clamp-3 leading-relaxed">
+              {/* Miniatura da Imagem do Evento */}
+              <div className="h-48 w-full bg-gray-100 relative">
+                {evento.imagemUrl ? (
+                  <img src={evento.imagemUrl} alt={evento.titulo} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">Sem Imagem</div>
+                )}
+                
+                {/* Badge de Idade sobreposto na imagem */}
+                <div className="absolute top-3 left-3 flex items-center text-sm font-bold mt-2 shadow-sm">
+                  {evento.idadeMinima === 0 ? (
+                    <span className="bg-green-500 text-white px-3 py-1 rounded-full text-xs">
+                      ✅ Livre
+                    </span>
+                  ) : (
+                    <span className="bg-red-500 text-white px-3 py-1 rounded-full text-xs">
+                      🔞 +{evento.idadeMinima} Anos
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="p-6 flex-grow flex flex-col">
+                <h3 className="text-xl font-bold text-gray-800 mb-2 line-clamp-1">{evento.titulo}</h3>
+                <p className="text-gray-600 text-sm mb-6 line-clamp-2 leading-relaxed">
                   {evento.descricao}
                 </p>
                 
-                <div className="space-y-3 mb-6">
+                <div className="space-y-3 mb-6 flex-grow">
                   <div className="flex items-center text-sm text-gray-500">
                     <span className="bg-gray-100 p-1.5 rounded mr-3">📅</span>
                     <span>{formatarData(evento.data)}</span>
                   </div>
                   <div className="flex items-center text-sm text-gray-500">
                     <span className="bg-gray-100 p-1.5 rounded mr-3">🎟️</span>
-                    <span>Capacidade: <span className="font-semibold text-gray-700">{evento.capacidadeMaxima} pessoas</span></span>
-                  </div>
-                  <div className="flex items-center text-sm font-bold mt-2">
-                    {evento.idadeMinima === 0 ? (
-                      <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs">
-                        ✅ Classificação Livre
-                      </span>
-                    ) : (
-                      <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs">
-                        🔞 +{evento.idadeMinima} Anos
-                      </span>
-                    )}
+                    <span>Capacidade: <span className="font-semibold text-gray-700">{evento.capacidadeMaxima}</span></span>
                   </div>
                 </div>
-              </div>
 
-              {/* Inscrição */}
-              <Link 
-                to={`/evento/${evento.id}/inscricao`}
-                className="block text-center w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition-colors mb-4"
-              >
-                Inscrever-se
-              </Link> 
-
-              {isAdmin && (
-              <div className="mt-6 pt-5 border-t border-gray-100 space-y-3">
+                {/* Botão Principal redirecionando para a página de Detalhes */}
                 <Link 
-                  to={`/admin/evento/${evento.id}/participantes`}
-                  className="block text-center w-full text-xs font-black uppercase tracking-widest text-blue-600 bg-blue-50 py-2 rounded-md hover:bg-blue-100 transition"
+                  to={`/evento/${evento.id}`}
+                  className="block text-center w-full bg-gray-900 text-white font-semibold py-3 rounded-lg hover:bg-black transition-colors mb-4"
                 >
-                  Lista de Inscritos
-                </Link>
-                
-                <div className="flex gap-2">
-                  <Link 
-                    to={`/admin/evento/${evento.id}/editar`}
-                    className="flex-1 text-center text-xs font-bold text-amber-600 border border-amber-200 py-2 rounded-md hover:bg-amber-50"
-                  >
-                    Editar
-                  </Link>
-                  
-                  <button 
-                    onClick={() => handleExcluir(evento.id, evento.titulo)}
-                    className="flex-1 text-center text-xs font-bold text-red-500 border border-red-100 py-2 rounded-md hover:bg-red-50"
-                  >
-                    Excluir
-                  </button>
-                </div>
+                  Ver Detalhes
+                </Link> 
+
+                {/* Controles Administrativos */}
+                {isAdmin && (
+                  <div className="mt-2 pt-5 border-t border-gray-100 space-y-3">
+                    <Link 
+                      to={`/admin/evento/${evento.id}/participantes`}
+                      className="block text-center w-full text-xs font-black uppercase tracking-widest text-blue-600 bg-blue-50 py-2 rounded-md hover:bg-blue-100 transition"
+                    >
+                      Lista de Inscritos
+                    </Link>
+                    
+                    <div className="flex gap-2">
+                      <Link 
+                        to={`/admin/evento/${evento.id}/editar`}
+                        className="flex-1 text-center text-xs font-bold text-amber-600 border border-amber-200 py-2 rounded-md hover:bg-amber-50 transition"
+                      >
+                        Editar
+                      </Link>
+                      
+                      <button 
+                        onClick={() => handleExcluir(evento.id, evento.titulo)}
+                        className="flex-1 text-center text-xs font-bold text-red-500 border border-red-100 py-2 rounded-md hover:bg-red-50 transition"
+                      >
+                        Excluir
+                      </button>
+                    </div>
+                  </div>
+                )}         
               </div>
-            )}         
-          </div>
+            </div>
           ))}
         </div>
       )}

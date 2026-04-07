@@ -9,6 +9,9 @@ namespace PortalEventos.Api.Models
         public int CapacidadeMaxima { get; set; }
         public int IdadeMinima { get; set; }
 
+        // URL da imagem (temporario durante desenvolvimento)
+        public string ImagemUrl { get; set; } = string.Empty;
+
         // Propriedade de navegação um evento tem vários participantes
         public List<Participante> Participantes { get; set; } = new();
     }

@@ -39,7 +39,7 @@ public class AuthController : ControllerBase
             Email = request.Email,
             // Criptografa a senha antes de salvar no SQLite
             SenhaHash = BCrypt.Net.BCrypt.HashPassword(request.Senha),
-            Perfil = "Comum",
+            Perfil = "Usuario",
             DataNascimento = request.DataNascimento
         };
 
@@ -100,7 +100,7 @@ public class AuthController : ControllerBase
             {
                 new Claim("id", usuario.Id.ToString()),
                 new Claim(ClaimTypes.Name, usuario.Nome),
-                new Claim(ClaimTypes.Role, usuario.Perfil) // Define se é Admin ou Comum
+                new Claim(ClaimTypes.Role, usuario.Perfil) // Define se é Admin ou Usuario
             }),
             Expires = DateTime.UtcNow.AddHours(3), // Token expira em 3 horas
             SigningCredentials = new SigningCredentials(
