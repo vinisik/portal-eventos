@@ -1,70 +1,67 @@
-import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Navbar from './components/Navbar';
 import ListaEventos from './pages/ListaEventos';
-import NovoEvento from './pages/NovoEvento';
-import ListaParticipantes from './pages/ListaParticipantes';
 import Inscricao from './pages/Inscricao';
-import EditarEvento from './pages/EditarEvento';
-import AdminLogin from './pages/AdminLogin';
 import VisualizarIngresso from './pages/VisualizarIngresso';
+import Login from './pages/Login';
+import Registro from './pages/Registro';
+import NovoEvento from './pages/NovoEvento';
+import EditarEvento from './pages/EditarEvento';
+import ListaParticipantes from './pages/ListaParticipantes';
 
-function App() {
-  // Verifica se o navegador tem o registo de que este utilizador é admin
-  const isAdmin = localStorage.getItem('isAdmin') === 'true';
+const AdminRoute = ({ children }) => {
+  const role = localStorage.getItem('roleUser');
+  
+  if (role === 'Admin') {
+    return children;
+  }
+  
+  // Se não for admin retorna para a tela de login
+  return <Navigate to="/login" replace />;
+};
 
-  const fazerLogout = () => {
-    localStorage.removeItem('isAdmin');
-    window.location.href = '/';
-  };
-
+export default function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-gray-50">
-        <nav className="bg-white shadow-sm mb-8">
-          <div className="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
-            <Link to="/" className="text-xl font-bold text-blue-600">
-              Portal de Eventos
-            </Link>
-            
-            <div className="space-x-6 flex items-center">
-              <Link to="/" className="text-gray-600 hover:text-blue-600 transition">Ver Eventos</Link>
+      <Navbar />
+      
+      <main className="max-w-7xl mx-auto px-4 mt-8">
+        <Routes>
+          <Route path="/" element={<ListaEventos />} />
+          <Route path="/evento/:id/inscricao" element={<Inscricao />} />
+          <Route path="/ticket/:hash" element={<VisualizarIngresso />} />
+          
+          <Route path="/login" element={<Login />} />
+          <Route path="/registrar" element={<Registro />} />
 
-              {/* Menu do Admin */}
-              {isAdmin && (
-                <>
-                  <Link
-                    to="/admin/novo"
-                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all"
-                  >
-                    <span>+</span> Novo Evento
-                  </Link>
-                  <button
-                    onClick={fazerLogout}
-                    className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm font-bold transition-colors shadow-sm"
-                  >
-                    Encerrar Sessão
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
-        </nav>
-
-        <main className="max-w-5xl mx-auto px-4 pb-12">
-          <Routes>
-            <Route path="/" element={<ListaEventos />} />
-            <Route path="/evento/:id/inscricao" element={<Inscricao />} />
-            <Route path="/admin" element={<AdminLogin />} />
-            <Route path="/ticket/:hash" element={<VisualizarIngresso />} />
-            
-            {/* ROTAS PROTEGIDAS */}
-            <Route path="/admin/novo" element={isAdmin ? <NovoEvento /> : <Navigate to="/login" />} />
-            <Route path="/admin/evento/:id/participantes" element={isAdmin ? <ListaParticipantes /> : <Navigate to="/login" />} />
-            <Route path="/admin/evento/:id/editar" element={isAdmin ? <EditarEvento /> : <Navigate to="/login" />} />
-          </Routes>
-        </main>
-      </div>
+          <Route 
+            path="/admin/novo" 
+            element={
+              <AdminRoute>
+                <NovoEvento />
+              </AdminRoute>
+            } 
+          />
+          <Route 
+            path="/admin/evento/:id/editar" 
+            element={
+              <AdminRoute>
+                <EditarEvento />
+              </AdminRoute>
+            } 
+          />
+          <Route 
+            path="/admin/evento/:id/participantes" 
+            element={
+              <AdminRoute>
+                <ListaParticipantes />
+              </AdminRoute>
+            } 
+          />
+          
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
     </Router>
   );
 }
-
-export default App;

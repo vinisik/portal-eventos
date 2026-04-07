@@ -7,7 +7,7 @@ export default function ListaEventos() {
   const [loading, setLoading] = useState(true);
 
   // Verifica se o usuário logou como administrador
-  const isAdmin = localStorage.getItem('isAdmin') === 'true';
+  const isAdmin = localStorage.getItem('roleUser') === 'Admin';
 
   useEffect(() => {
     buscarEventos();

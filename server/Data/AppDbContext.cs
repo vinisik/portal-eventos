@@ -9,6 +9,7 @@ namespace PortalEventos.Api.Data
 
         public DbSet<Evento> Eventos { get; set; }
         public DbSet<Participante> Participantes { get; set; }
+        public DbSet<Usuario> Usuarios { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

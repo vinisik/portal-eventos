@@ -1,8 +1,25 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using PortalEventos.Api.Data;
+using System.Text;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var jwtKey = builder.Configuration["Jwt:Key"] ?? "MinhaChaveSuperSecretaEParaOJWT123!"; // Chave é apenas para desenvolvimento.
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtKey)),
+            ValidateIssuer = false,
+            ValidateAudience = false
+        };
+    });
 
 // Configuração do Banco de Dados
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -35,6 +52,9 @@ if (app.Environment.IsDevelopment())
 // app.UseHttpsRedirection(); 
 
 app.UseCors("PermitirTudo");
+
+app.UseAuthentication(); // Descobre quem é o usuário
+app.UseAuthorization();  // Verifica se ele tem permissão
 
 app.UseAuthorization();
 app.MapControllers();
