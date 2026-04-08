@@ -91,11 +91,11 @@ export default function ListaEventos() {
                 <div className="absolute top-3 left-3 flex items-center text-sm font-bold mt-2 shadow-sm">
                   {evento.idadeMinima === 0 ? (
                     <span className="bg-green-500 text-white px-3 py-1 rounded-full text-xs">
-                      ✅ Livre
+                      Livre
                     </span>
                   ) : (
                     <span className="bg-red-500 text-white px-3 py-1 rounded-full text-xs">
-                      🔞 +{evento.idadeMinima} Anos
+                      +{evento.idadeMinima} Anos
                     </span>
                   )}
                 </div>

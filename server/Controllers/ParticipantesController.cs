@@ -47,6 +47,14 @@ namespace PortalEventos.Api.Controllers
                     return BadRequest($"Idade insuficiente. Você tem {idadeCalculada} anos, mas o evento exige {evento.IdadeMinima} anos.");
             }
 
+            bool jaInscrito = await _context.Participantes
+                .AnyAsync(p => p.EventoId == participante.EventoId && p.Email == participante.Email);
+
+            if (jaInscrito)
+            {
+                return BadRequest("Você já está inscrito neste evento! Acesse a aba 'Meus Ingressos' no seu perfil para ver o seu ingresso.");
+            }
+
             // Salva a inscrição no banco
             _context.Participantes.Add(participante);
             await _context.SaveChangesAsync();

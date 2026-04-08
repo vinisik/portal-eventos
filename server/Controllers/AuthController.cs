@@ -87,6 +87,35 @@ public class AuthController : ControllerBase
         return Ok(lista);
     }
 
+    [Authorize]
+    [HttpGet("meus-ingressos")]
+    public async Task<ActionResult> GetMeusIngressos()
+    {
+        // Pega o ID do usuário a partir do Token JWT que veio na requisição
+        var userIdClaim = User.FindFirst("id")?.Value;
+        if (userIdClaim == null) return Unauthorized();
+
+        var usuario = await _context.Usuarios.FindAsync(int.Parse(userIdClaim));
+        if (usuario == null) return NotFound("Usuário não encontrado.");
+
+        // Busca os eventos onde esse usuário está inscrito
+        var ingressos = await _context.Eventos
+            .Include(e => e.Participantes)
+            .Where(e => e.Participantes.Any(p => p.Email == usuario.Email))
+            .Select(e => new
+            {
+                EventoId = e.Id,
+                Titulo = e.Titulo,
+                Data = e.Data,
+                ImagemUrl = e.ImagemUrl,
+                // Pega o Hash do ingresso específico desse usuário
+                TicketHash = e.Participantes.First(p => p.Email == usuario.Email).TicketHash
+            })
+            .ToListAsync();
+
+        return Ok(ingressos);
+    }
+
     // MÉTODO PRIVADO PARA CRIAR O TOKEN
     private string GerarJwtToken(Usuario usuario)
     {

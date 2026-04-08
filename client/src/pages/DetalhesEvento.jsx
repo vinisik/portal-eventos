@@ -48,11 +48,11 @@ export default function DetalhesEvento() {
         <div className="absolute top-4 left-4">
           {evento.idadeMinima === 0 ? (
             <span className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
-              ✅ Livre
+              Livre
             </span>
           ) : (
             <span className="bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
-              🔞 +{evento.idadeMinima} Anos
+              +{evento.idadeMinima} Anos
             </span>
           )}
         </div>

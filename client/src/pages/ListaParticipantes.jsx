@@ -64,7 +64,7 @@ export default function ListaParticipantes() {
                   E-mail
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Código do Bilhete (Hash)
+                  Código do Ingresso (Hash)
                 </th>
               </tr>
             </thead>

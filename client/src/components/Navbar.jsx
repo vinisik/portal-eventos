@@ -43,15 +43,24 @@ export default function Navbar() {
                 )}
 
                 {/* Info do Usuário */}
-                <div className="flex items-center gap-3">
-                  <div className="text-right hidden sm:block">
+                <div className="flex items-center gap-4 border-l border-gray-200 pl-6 ml-2">
+                  
+                  {/* Link para a página de perfil/ingressos do usuário */}
+                  <Link 
+                    to="/perfil" 
+                    className="text-sm font-bold text-gray-600 hover:text-blue-600 transition"
+                  >
+                    Meus Ingressos
+                  </Link>
+
+                  <div className="text-right hidden sm:block ml-4">
                     <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">Bem-vindo</p>
                     <p className="text-sm font-bold text-gray-800">{nomeUsuario}</p>
                   </div>
                   
                   <button 
                     onClick={handleLogout}
-                    className="bg-red-50 text-red-600 px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest hover:bg-red-100 transition"
+                    className="bg-red-50 text-red-600 px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest hover:bg-red-100 transition ml-2"
                   >
                     Sair
                   </button>
