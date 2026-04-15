@@ -6,6 +6,7 @@ namespace PortalEventos.Api.Models
         public string Titulo { get; set; } = string.Empty;
         public string Descricao { get; set; } = string.Empty;
         public DateTime Data { get; set; }
+        public DateTime DataAberturaInscricoes { get; set; } = DateTime.Now;
         public int CapacidadeMaxima { get; set; }
         public int IdadeMinima { get; set; }
 

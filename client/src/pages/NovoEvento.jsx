@@ -11,6 +11,7 @@ export default function NovoEvento() {
         titulo: '',
         descricao: '',
         data: '',
+        dataAberturaInscricoes: '',
         capacidadeMaxima: '',
         imagemUrl: '',   
         idadeMinima: '0' 
@@ -32,7 +33,8 @@ export default function NovoEvento() {
                 data: formData.data,
                 imagemUrl: formData.imagemUrl,
                 capacidadeMaxima: parseInt(formData.capacidadeMaxima),
-                idadeMinima: parseInt(formData.idadeMinima) 
+                idadeMinima: parseInt(formData.idadeMinima),
+                dataAberturaInscricoes: formData.dataAberturaInscricoes || new Date().toISOString()
             });
 
             alert('Evento criado com sucesso!');
@@ -105,6 +107,15 @@ export default function NovoEvento() {
                             value={formData.data} onChange={handleChange}
                             className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 outline-none transition"
                         />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Abertura das Inscrições</label>
+                        <input
+                            type="datetime-local" name="dataAberturaInscricoes"
+                            value={formData.dataAberturaInscricoes} onChange={handleChange}
+                            className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 outline-none transition"
+                        />
+                        <p className="text-[10px] text-gray-400 mt-1">Deixe em branco para abrir imediatamente.</p>
                     </div>
 
                     <div>

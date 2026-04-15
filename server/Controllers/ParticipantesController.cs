@@ -24,10 +24,16 @@ namespace PortalEventos.Api.Controllers
             var evento = await _context.Eventos.FindAsync(participante.EventoId);
             if (evento == null) return NotFound("Evento não encontrado.");
 
+            if (DateTime.Now < evento.DataAberturaInscricoes)
+            {
+                return BadRequest($"As inscrições para este evento só abrem em: {evento.DataAberturaInscricoes:dd/MM/yyyy às HH:mm}.");
+            }
+
             // Verifica se ainda há vagas
             var totalInscritos = await _context.Participantes.CountAsync(p => p.EventoId == participante.EventoId);
             if (totalInscritos >= evento.CapacidadeMaxima) return BadRequest("As vagas para este evento estão esgotadas.");
 
+            // Validação de Idade 
             if (evento.IdadeMinima > 0) 
             {
                 var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.Email == participante.Email);
@@ -39,14 +45,14 @@ namespace PortalEventos.Api.Controllers
                 var hoje = DateTime.Today;
                 var idadeCalculada = hoje.Year - usuario.DataNascimento.Year;
                 
-                // Se a pessoa ainda não fez aniversário este ano, subtrai 1 da idade
                 if (usuario.DataNascimento.Date > hoje.AddYears(-idadeCalculada)) 
                     idadeCalculada--;
 
                 if (idadeCalculada < evento.IdadeMinima)
-                    return BadRequest($"Idade insuficiente. Você tem {idadeCalculada} anos, mas o evento exige {evento.IdadeMinima} anos.");
+                    return BadRequest($"Evento disponível apenas para maiores de {evento.IdadeMinima} anos.");
             }
 
+            // Trava de Inscrição Duplicada
             bool jaInscrito = await _context.Participantes
                 .AnyAsync(p => p.EventoId == participante.EventoId && p.Email == participante.Email);
 

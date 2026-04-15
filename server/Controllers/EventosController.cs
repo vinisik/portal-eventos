@@ -18,12 +18,26 @@ namespace PortalEventos.Api.Controllers
 
         // Lista os eventos disponíveis
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Evento>>> GetEventos()
+        public async Task<ActionResult> GetEventos()
         {
-            return await _context.Eventos
-                                 .Include(e => e.Participantes)
-                                 .ToListAsync();
+            var eventos = await _context.Eventos
+                .Select(e => new 
+                {
+                    e.Id,
+                    e.Titulo,
+                    e.Descricao,
+                    e.Data,
+                    e.ImagemUrl,
+                    e.CapacidadeMaxima,
+                    e.IdadeMinima,
+                    e.DataAberturaInscricoes,
+                    VagasOcupadas = e.Participantes.Count() 
+                })
+                .ToListAsync();
+
+            return Ok(eventos);
         }
+
 
         // Cadastro de evento pelo admin
         [HttpPost]

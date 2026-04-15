@@ -19,7 +19,7 @@ export default function ListaEventos() {
       setEventos(response.data);
     } catch (error) {
       console.error("Erro ao buscar eventos:", error);
-      alert("Não foi possível carregar os eventos. Verifique se a API está rodando.");
+      alert("Não foi possível carregar os eventos. Verifique se a API está em execução.");
     } finally {
       setLoading(false);
     }
@@ -43,6 +43,36 @@ export default function ListaEventos() {
       day: '2-digit', month: '2-digit', year: 'numeric', 
       hour: '2-digit', minute: '2-digit' 
     });
+  };
+
+  // Função interna para analisar o estado e a quantidade de vagas
+  const analisarEstadoEvento = (evento) => {
+    const agora = new Date();
+    // Se a data de abertura não existir no payload, assume uma data passada para manter aberto
+    const dataAbertura = evento.dataAberturaInscricoes ? new Date(evento.dataAberturaInscricoes) : new Date(0);
+    const dataEvento = new Date(evento.data);
+    
+    const vagasOcupadas = evento.vagasOcupadas || 0; 
+    const vagasTotais = evento.capacidadeMaxima;
+    const vagasDisponiveis = vagasTotais - vagasOcupadas;
+    
+    const porcentagemDisponivel = (vagasDisponiveis / vagasTotais) * 100;
+    const isEscasso = vagasDisponiveis > 0 && (porcentagemDisponivel <= 20 || vagasDisponiveis <= 10);
+
+    if (agora > dataEvento) {
+        return { status: "ENCERRADO", textoBadge: "Encerrado", corBadge: "bg-gray-200 text-gray-600", mostrarEscassez: false, vagasDisponiveis };
+    }
+    
+    if (agora < dataAbertura) {
+        const formatada = dataAbertura.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+        return { status: "EM_BREVE", textoBadge: `Inscrições abertas em ${formatada}`, corBadge: "bg-amber-100 text-amber-700", mostrarEscassez: false, vagasDisponiveis };
+    }
+    
+    if (vagasDisponiveis <= 0) {
+        return { status: "ESGOTADO", textoBadge: "Esgotado", corBadge: "bg-red-100 text-red-700", mostrarEscassez: false, vagasDisponiveis };
+    }
+
+    return { status: "ABERTO", textoBadge: "Inscrições Abertas", corBadge: "bg-green-100 text-green-700", mostrarEscassez: isEscasso, vagasDisponiveis };
   };
 
   if (loading) {
@@ -76,86 +106,103 @@ export default function ListaEventos() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {eventos.map((evento) => (
-            <div key={evento.id} className="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col hover:shadow-lg transition-shadow duration-300 overflow-hidden">
-              
-              {/* Miniatura da Imagem do Evento */}
-              <div className="h-48 w-full bg-gray-100 relative">
-                {evento.imagemUrl ? (
-                  <img src={evento.imagemUrl} alt={evento.titulo} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">Sem Imagem</div>
-                )}
+          {eventos.map((evento) => {
+            const estado = analisarEstadoEvento(evento);
+
+            return (
+              <div key={evento.id} className="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col hover:shadow-lg transition-shadow duration-300 overflow-hidden">
                 
-                {/* Badge de Idade sobreposto na imagem */}
-                <div className="absolute top-3 left-3 flex items-center text-sm font-bold mt-2 shadow-sm">
-                  {evento.idadeMinima === 0 ? (
-                    <span className="bg-green-500 text-white px-3 py-1 rounded-full text-xs">
-                      Livre
-                    </span>
+                {/* Miniatura da Imagem do Evento */}
+                <div className="h-48 w-full bg-gray-100 relative">
+                  {evento.imagemUrl ? (
+                    <img src={evento.imagemUrl} alt={evento.titulo} className="w-full h-full object-cover" />
                   ) : (
-                    <span className="bg-red-500 text-white px-3 py-1 rounded-full text-xs">
-                      +{evento.idadeMinima} Anos
-                    </span>
+                    <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">Sem Imagem</div>
                   )}
-                </div>
-              </div>
-
-              <div className="p-6 flex-grow flex flex-col">
-                <h3 className="text-xl font-bold text-gray-800 mb-2 line-clamp-1">{evento.titulo}</h3>
-                <p className="text-gray-600 text-sm mb-6 line-clamp-2 leading-relaxed">
-                  {evento.descricao}
-                </p>
-                
-                <div className="space-y-3 mb-6 flex-grow">
-                  <div className="flex items-center text-sm text-gray-500">
-                    <span className="bg-gray-100 p-1.5 rounded mr-3">📅</span>
-                    <span>{formatarData(evento.data)}</span>
-                  </div>
-                  <div className="flex items-center text-sm text-gray-500">
-                    <span className="bg-gray-100 p-1.5 rounded mr-3">🎟️</span>
-                    <span>Capacidade: <span className="font-semibold text-gray-700">{evento.capacidadeMaxima}</span></span>
-                  </div>
-                </div>
-
-                {/* Botão Principal redirecionando para a página de Detalhes */}
-                <Link 
-                  to={`/evento/${evento.id}`}
-                  className="block text-center w-full bg-gray-900 text-white font-semibold py-3 rounded-lg hover:bg-black transition-colors mb-4"
-                >
-                  Ver Detalhes
-                </Link> 
-
-                {/* Controles Administrativos */}
-                {isAdmin && (
-                  <div className="mt-2 pt-5 border-t border-gray-100 space-y-3">
-                    <Link 
-                      to={`/admin/evento/${evento.id}/participantes`}
-                      className="block text-center w-full text-xs font-black uppercase tracking-widest text-blue-600 bg-blue-50 py-2 rounded-md hover:bg-blue-100 transition"
-                    >
-                      Lista de Inscritos
-                    </Link>
+                  
+                  {/* Badges Flutuantes */}
+                  <div className="absolute top-3 left-3 flex flex-col gap-2 shadow-sm">
+                    {evento.idadeMinima === 0 ? (
+                      <span className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold w-max shadow-md">
+                        Livre
+                      </span>
+                    ) : (
+                      <span className="bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold w-max shadow-md">
+                        +{evento.idadeMinima} Anos
+                      </span>
+                    )}
                     
-                    <div className="flex gap-2">
-                      <Link 
-                        to={`/admin/evento/${evento.id}/editar`}
-                        className="flex-1 text-center text-xs font-bold text-amber-600 border border-amber-200 py-2 rounded-md hover:bg-amber-50 transition"
-                      >
-                        Editar
-                      </Link>
-                      
-                      <button 
-                        onClick={() => handleExcluir(evento.id, evento.titulo)}
-                        className="flex-1 text-center text-xs font-bold text-red-500 border border-red-100 py-2 rounded-md hover:bg-red-50 transition"
-                      >
-                        Excluir
-                      </button>
+                    <span className={`px-3 py-1 rounded-full text-xs font-bold w-max shadow-md ${estado.corBadge}`}>
+                      {estado.textoBadge}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="p-6 flex-grow flex flex-col">
+                  <h3 className="text-xl font-bold text-gray-800 mb-2 line-clamp-1">{evento.titulo}</h3>
+                  <p className="text-gray-600 text-sm mb-6 line-clamp-2 leading-relaxed">
+                    {evento.descricao}
+                  </p>
+                  
+                  <div className="space-y-3 mb-6 flex-grow">
+                    <div className="flex items-center text-sm text-gray-500">
+                      <span className="bg-gray-100 p-1.5 rounded mr-3">📅</span>
+                      <span>{formatarData(evento.data)}</span>
+                    </div>
+                    <div className="flex items-center text-sm text-gray-500">
+                      <span className="bg-gray-100 p-1.5 rounded mr-3">🎟️</span>
+                      <span>Vagas Ocupadas: <span className="font-semibold text-gray-700">{evento.vagasOcupadas || 0} / {evento.capacidadeMaxima}</span></span>
                     </div>
                   </div>
-                )}         
+
+                  {/* Alerta de vagas acabando */}
+                  {estado.mostrarEscassez && (
+                    <div className="mb-4 bg-orange-50 border border-orange-200 rounded-lg p-2 text-center">
+                        <span className="animate-pulse text-orange-600 text-xs font-black uppercase tracking-widest">
+                            🔥 Apenas {estado.vagasDisponiveis} vagas restantes!
+                        </span>
+                    </div>
+                  )}
+
+                  {/* Botão Principal redirecionando para a página de Detalhes */}
+                  <Link 
+                    to={`/evento/${evento.id}`}
+                    className="block text-center w-full bg-gray-900 text-white font-semibold py-3 rounded-lg hover:bg-black transition-colors mb-4"
+                  >
+                    Ver Detalhes
+                  </Link> 
+
+                  {/* Controles Admin */}
+                  {isAdmin && (
+                    <div className="mt-2 pt-5 border-t border-gray-100 space-y-3">
+                      <Link 
+                        to={`/admin/evento/${evento.id}/participantes`}
+                        className="block text-center w-full text-xs font-black uppercase tracking-widest text-blue-600 bg-blue-50 py-2 rounded-md hover:bg-blue-100 transition"
+                      >
+                        Lista de Inscritos
+                      </Link>
+                      
+                      <div className="flex gap-2">
+                        <Link 
+                          to={`/admin/evento/${evento.id}/editar`}
+                          className="flex-1 text-center text-xs font-bold text-amber-600 border border-amber-200 py-2 rounded-md hover:bg-amber-50 transition"
+                        >
+                          Editar
+                        </Link>
+                        
+                        <button 
+                          onClick={() => handleExcluir(evento.id, evento.titulo)}
+                          className="flex-1 text-center text-xs font-bold text-red-500 border border-red-100 py-2 rounded-md hover:bg-red-50 transition"
+                        >
+                          Excluir
+                        </button>
+                      </div>
+                    </div>
+                  )}         
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
