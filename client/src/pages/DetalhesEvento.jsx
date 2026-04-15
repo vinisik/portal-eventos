@@ -23,10 +23,9 @@ export default function DetalhesEvento() {
     buscarEvento();
   }, [id]);
 
-  if (loading) return <div className="text-center mt-20">Carregando detalhes...</div>;
+  if (loading) return <div className="text-center mt-20">A carregar detalhes...</div>;
   if (!evento) return <div className="text-center mt-20">Evento não encontrado.</div>;
 
-  // --- LÓGICA DE ESTADO E ESCASSEZ ---
   const agora = new Date();
   const dataAbertura = evento.dataAberturaInscricoes ? new Date(evento.dataAberturaInscricoes) : new Date(0);
   const dataEvento = new Date(evento.data);
@@ -39,14 +38,14 @@ export default function DetalhesEvento() {
   const porcentagemDisponivel = (vagasDisponiveis / vagasTotais) * 100;
   const isEscasso = vagasDisponiveis > 0 && (porcentagemDisponivel <= 20 || vagasDisponiveis <= 10);
 
-  // Define o estado da Área de Ação (CTA)
+  // Define o estado da inscrição com base nas condições do evento
   let statusInscricao = { ativo: false, texto: "", corBotao: "bg-gray-300 text-gray-500 cursor-not-allowed", mensagem: "" };
 
   if (agora > dataEvento) {
       statusInscricao = { ativo: false, texto: "Evento Encerrado", corBotao: "bg-gray-300 text-gray-500", mensagem: "Este evento já aconteceu." };
   } else if (agora < dataAbertura) {
       const formataData = dataAbertura.toLocaleString('pt-BR', { day: '2-digit', month: 'long', hour: '2-digit', minute: '2-digit' });
-      statusInscricao = { ativo: false, texto: "Em Breve", corBotao: "bg-indigo-100 text-indigo-700", mensagem: `Inscrições abrem em ${formataData}` };
+      statusInscricao = { ativo: false, texto: "Em Breve", corBotao: "bg-amber-100 text-amber-700", mensagem: `Inscrições abrem em ${formataData}` };
   } else if (vagasDisponiveis <= 0) {
       statusInscricao = { ativo: false, texto: "Esgotado", corBotao: "bg-red-100 text-red-700 font-bold", mensagem: "Infelizmente todas as vagas foram preenchidas." };
   } else {
@@ -65,7 +64,7 @@ export default function DetalhesEvento() {
         )}
         
         {/* Badge de Idade */}
-        <div className="absolute top-4 left-4">
+        <div className="absolute top-4 left-4 flex gap-2">
           {evento.idadeMinima === 0 ? (
             <span className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">Livre</span>
           ) : (
@@ -76,7 +75,15 @@ export default function DetalhesEvento() {
 
       {/* CONTEÚDO E INFORMAÇÕES */}
       <div className="p-8 md:p-12 max-w-4xl mx-auto">
+        
         <h1 className="text-4xl font-extrabold text-gray-900 mb-4">{evento.titulo}</h1>
+        
+        {/* Nova Etiqueta de Categoria */}
+        <div className="flex items-center gap-2 mb-6">
+          <span className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest border border-blue-100">
+            {evento.categoria || 'Outros'}
+          </span>
+        </div>
         
         <div className="flex flex-wrap gap-8 mb-8 border-b border-gray-100 pb-8">
           <div className="flex items-center text-gray-600">

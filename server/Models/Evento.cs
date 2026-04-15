@@ -9,6 +9,7 @@ namespace PortalEventos.Api.Models
         public DateTime DataAberturaInscricoes { get; set; } = DateTime.Now;
         public int CapacidadeMaxima { get; set; }
         public int IdadeMinima { get; set; }
+        public string Categoria { get; set; } = "Outros";
 
         // URL da imagem (temporario durante desenvolvimento)
         public string ImagemUrl { get; set; } = string.Empty;

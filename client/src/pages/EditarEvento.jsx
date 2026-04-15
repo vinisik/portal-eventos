@@ -7,16 +7,16 @@ export default function EditarEvento() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false); 
   
-  // 1. Estado atualizado com o campo dataAberturaInscricoes
   const [formData, setFormData] = useState({
     id: '', 
     titulo: '', 
     descricao: '', 
     data: '', 
-    dataAberturaInscricoes: '', // Novo campo adicionado
+    dataAberturaInscricoes: '', 
     capacidadeMaxima: '',
     imagemUrl: '',    
-    idadeMinima: '0'  
+    idadeMinima: '0',
+    categoria: 'Outros' 
   });
 
   useEffect(() => {
@@ -27,18 +27,14 @@ export default function EditarEvento() {
         
         if (eventoEncontrado) {
           setFormData({
-            id: eventoEncontrado.id,
-            titulo: eventoEncontrado.titulo,
-            descricao: eventoEncontrado.descricao,
-            // Formata a data principal para o input datetime-local
+            ...eventoEncontrado,
             data: new Date(eventoEncontrado.data).toISOString().slice(0, 16),
-            // Formata a data de abertura, validando se ela existe no banco de dados
             dataAberturaInscricoes: eventoEncontrado.dataAberturaInscricoes 
               ? new Date(eventoEncontrado.dataAberturaInscricoes).toISOString().slice(0, 16) 
               : '',
-            capacidadeMaxima: eventoEncontrado.capacidadeMaxima,
-            imagemUrl: eventoEncontrado.imagemUrl || '', 
-            idadeMinima: eventoEncontrado.idadeMinima.toString() 
+            idadeMinima: eventoEncontrado.idadeMinima.toString(),
+            imagemUrl: eventoEncontrado.imagemUrl || '',
+            categoria: eventoEncontrado.categoria || 'Outros' 
           });
         }
       } catch (error) {
@@ -61,7 +57,6 @@ export default function EditarEvento() {
         ...formData,
         capacidadeMaxima: parseInt(formData.capacidadeMaxima),
         idadeMinima: parseInt(formData.idadeMinima),
-        // Envia a data escolhida ou, se estiver vazia, define o momento atual
         dataAberturaInscricoes: formData.dataAberturaInscricoes || new Date().toISOString()
       });
       
@@ -113,7 +108,6 @@ export default function EditarEvento() {
           <textarea required name="descricao" rows="4" value={formData.descricao} onChange={handleChange} className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
         </div>
 
-        {/* 2. Grid reestruturado para acomodar 4 elementos de forma equilibrada */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Data e Hora do Evento</label>
@@ -147,10 +141,27 @@ export default function EditarEvento() {
                 <option value="18">+18 Anos</option>
             </select>
           </div>
+
+          {/* Selecionar Categoria */}
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Categoria do Evento</label>
+            <select 
+              name="categoria" value={formData.categoria} onChange={handleChange}
+              className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+            >
+              <option value="Tecnologia">Tecnologia</option>
+              <option value="Negócios">Negócios</option>
+              <option value="Música">Música</option>
+              <option value="Educação">Educação</option>
+              <option value="Esportes">Esportes</option>
+              <option value="Cultura">Cultura</option>
+              <option value="Outros">Outros</option>
+            </select>
+          </div>
         </div>
 
         <button type="submit" disabled={loading} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-md mt-6 shadow-lg shadow-blue-100 transition-all">
-          {loading ? 'Salvando Alterações...' : 'Confirmar Atualização'}
+          {loading ? 'A Guardar Alterações...' : 'Confirmar Atualização'}
         </button>
       </form>
     </div>

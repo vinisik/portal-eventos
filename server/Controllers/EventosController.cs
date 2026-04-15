@@ -31,7 +31,8 @@ namespace PortalEventos.Api.Controllers
                     e.CapacidadeMaxima,
                     e.IdadeMinima,
                     e.DataAberturaInscricoes,
-                    VagasOcupadas = e.Participantes.Count() 
+                    VagasOcupadas = e.Participantes.Count(),
+                    Categoria = e.Categoria ?? "Outros",
                 })
                 .ToListAsync();
 
