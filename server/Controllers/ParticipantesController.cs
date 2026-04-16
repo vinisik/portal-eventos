@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PortalEventos.Api.Data;
 using PortalEventos.Api.Models;
+using PortalEventos.Api.Services;
 
 namespace PortalEventos.Api.Controllers
 {
@@ -10,18 +11,20 @@ namespace PortalEventos.Api.Controllers
     public class ParticipantesController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly EmailService _emailService;
 
-        public ParticipantesController(AppDbContext context)
+        public ParticipantesController(AppDbContext context, EmailService emailService)
         {
             _context = context;
+            _emailService = emailService;
         }
 
         // Inscrição online
         [HttpPost]
-        public async Task<ActionResult<Participante>> PostParticipante(Participante participante)
+        public async Task<ActionResult<Participante>> PostParticipante(Participante user)
         {
             // Verifica se o evento realmente existe
-            var evento = await _context.Eventos.FindAsync(participante.EventoId);
+            var evento = await _context.Eventos.FindAsync(user.EventoId);
             if (evento == null) return NotFound("Evento não encontrado.");
 
             if (DateTime.Now < evento.DataAberturaInscricoes)
@@ -30,22 +33,22 @@ namespace PortalEventos.Api.Controllers
             }
 
             // Verifica se ainda há vagas
-            var totalInscritos = await _context.Participantes.CountAsync(p => p.EventoId == participante.EventoId);
+            var totalInscritos = await _context.Participantes.CountAsync(p => p.EventoId == user.EventoId);
             if (totalInscritos >= evento.CapacidadeMaxima) return BadRequest("As vagas para este evento estão esgotadas.");
 
             // Validação de Idade 
             if (evento.IdadeMinima > 0) 
             {
-                var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.Email == participante.Email);
+                var usuarioConta = await _context.Usuarios.FirstOrDefaultAsync(u => u.Email == user.Email);
                 
-                if (usuario == null) 
+                if (usuarioConta == null) 
                     return BadRequest($"A idade mínima para este evento é de {evento.IdadeMinima} anos. Crie uma conta no portal.");
 
                 // Cálculo dinâmico da idade baseado na DataNascimento
                 var hoje = DateTime.Today;
-                var idadeCalculada = hoje.Year - usuario.DataNascimento.Year;
+                var idadeCalculada = hoje.Year - usuarioConta.DataNascimento.Year;
                 
-                if (usuario.DataNascimento.Date > hoje.AddYears(-idadeCalculada)) 
+                if (usuarioConta.DataNascimento.Date > hoje.AddYears(-idadeCalculada)) 
                     idadeCalculada--;
 
                 if (idadeCalculada < evento.IdadeMinima)
@@ -54,7 +57,7 @@ namespace PortalEventos.Api.Controllers
 
             // Trava de Inscrição Duplicada
             bool jaInscrito = await _context.Participantes
-                .AnyAsync(p => p.EventoId == participante.EventoId && p.Email == participante.Email);
+                .AnyAsync(p => p.EventoId == user.EventoId && p.Email == user.Email);
 
             if (jaInscrito)
             {
@@ -62,11 +65,14 @@ namespace PortalEventos.Api.Controllers
             }
 
             // Salva a inscrição no banco
-            _context.Participantes.Add(participante);
+            _context.Participantes.Add(user);
             await _context.SaveChangesAsync();
 
-            // Retorna os dados do participante 
-            return Ok(participante);
+            // Disparo do e-mail de confirmação
+            _ = _emailService.EnviarIngressoAsync(user.Email, user.Nome, evento.Titulo);
+
+            // Retorna os dados do usuário inscrito 
+            return Ok(user);
         }
     }
 }

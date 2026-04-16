@@ -8,4 +8,6 @@ public class Usuario
     public string SenhaHash { get; set; } = string.Empty;
     public string Perfil { get; set; } = "Usuario"; // "Usuario" ou "Admin"
     public DateTime DataNascimento { get; set; }
+    public bool EmailConfirmado { get; set; } = false;
+    public string? TokenConfirmacaoEmail { get; set; }
 }

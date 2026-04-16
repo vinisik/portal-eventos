@@ -11,6 +11,7 @@ import ListaParticipantes from './pages/ListaParticipantes';
 import AdminUsuarios from './pages/AdminUsuarios';
 import DetalhesEvento from './pages/DetalhesEvento';
 import Perfil from './pages/Perfil';
+import ConfirmarEmail from './pages/ConfirmarEmail';
 
 const AdminRoute = ({ children }) => {
   const role = localStorage.getItem('roleUser');
@@ -38,35 +39,28 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/registrar" element={<Registro />} />
           <Route path="/perfil" element={<Perfil />} />
+          <Route path="/confirmar-email" element={<ConfirmarEmail />} />
 
-          <Route 
-            path="/admin/novo" 
-            element={
+          <Route path="/admin/novo" element={
               <AdminRoute>
                 <NovoEvento />
               </AdminRoute>
             } 
           />
-          <Route 
-            path="/admin/evento/:id/editar" 
-            element={
+          <Route path="/admin/evento/:id/editar" element={
               <AdminRoute>
                 <EditarEvento />
               </AdminRoute>
             } 
           />
-          <Route 
-            path="/admin/evento/:id/participantes" 
-            element={
+          <Route path="/admin/evento/:id/participantes" element={
               <AdminRoute>
                 <ListaParticipantes />
               </AdminRoute>
             } 
           />
 
-          <Route 
-            path="/admin/usuarios" 
-            element={
+          <Route path="/admin/usuarios" element={
               <AdminRoute>
                 <AdminUsuarios />
               </AdminRoute>

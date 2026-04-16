@@ -8,24 +8,58 @@ export default function Registro() {
   const [senha, setSenha] = useState('');
   const [dataNascimento, setDataNascimento] = useState('');
   const [loading, setLoading] = useState(false);
+  const [contaCriada, setContaCriada] = useState(false); 
+  
   const navigate = useNavigate();
 
   const handleRegistro = async (e) => {
     e.preventDefault();
     setLoading(true);
+
+    // Monta o objeto com os dados dos estados
+    const dadosRegistro = {
+      nome,
+      email,
+      senha,
+      dataNascimento
+    };
+
     try {
-      // Chamada para o AuthController.cs 
-      await api.post('/auth/registrar', { nome, email, senha, dataNascimento });
+      const response = await api.post('/auth/registrar', dadosRegistro);
       
-      alert("Conta criada com sucesso! Agora você pode fazer login.");
-      navigate('/login'); // Redireciona para o login
+      setContaCriada(true);
+      
     } catch (error) {
-      const mensagem = error.response?.data || "Erro ao criar conta. Tente outro e-mail.";
-      alert(mensagem);
+      console.error("Erro no registro:", error);
+      alert(error.response?.data || "Erro ao criar conta. Verifique os dados.");
     } finally {
       setLoading(false);
     }
   };
+
+  // Se a conta foi criada, mostra a mensagem de ativação de e-mail
+  if (contaCriada) {
+    return (
+      <div className="max-w-md mx-auto mt-16 p-10 bg-white rounded-2xl shadow-xl border border-blue-100 text-center">
+        <div className="w-20 h-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
+          <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+          </svg>
+        </div>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Verifique seu e-mail!</h2>
+        <p className="text-gray-600 mb-6 leading-relaxed">
+          Quase lá! Enviamos um link de ativação para <strong>{email}</strong>. 
+          Acesse sua caixa de entrada para liberar seu acesso.
+        </p>
+        <Link 
+          to="/login" 
+          className="inline-block w-full py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition shadow-lg shadow-blue-100"
+        >
+          Ir para o Login
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-md mx-auto mt-16 p-8 bg-white rounded-2xl shadow-xl border border-gray-50">
@@ -74,7 +108,7 @@ export default function Registro() {
         <button 
           type="submit" 
           disabled={loading}
-          className={`w-full py-3 rounded-lg font-bold text-white transition-all ${loading ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700 shadow-lg hover:shadow-blue-200'}`}
+          className={`w-full py-3 rounded-lg font-bold text-white transition-all ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 shadow-lg hover:shadow-blue-200'}`}
         >
           {loading ? 'Processando...' : 'Cadastrar agora'}
         </button>
