@@ -53,7 +53,7 @@ export default function DetalhesEvento() {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-10">
+    <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden mb-10">
       
       {/* BANNER DO EVENTO */}
       <div className="h-64 md:h-96 w-full bg-gray-200 relative">

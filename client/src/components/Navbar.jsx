@@ -16,7 +16,7 @@ export default function Navbar() {
 
   return (
     <nav className="bg-white shadow-sm border-b border-gray-100 mb-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           
           {/* Logo / Home */}
@@ -30,7 +30,7 @@ export default function Navbar() {
           <div className="flex items-center gap-4">
             {token ? (
               <div className="flex items-center gap-6">
-                {/* Menu de Admin (Aparece apenas se for Admin) */}
+                {/* Menu de Admin */}
                 {perfil === 'Admin' && (
                   <div className="flex gap-4 border-r border-gray-200 pr-6">
                     <Link to="/admin/novo" className="text-sm font-bold text-blue-600 hover:text-blue-700">
@@ -46,12 +46,14 @@ export default function Navbar() {
                 <div className="flex items-center gap-4 border-l border-gray-200 pl-6 ml-2">
                   
                   {/* Link para a página de perfil/ingressos do usuário */}
-                  <Link 
-                    to="/perfil" 
-                    className="text-sm font-bold text-gray-600 hover:text-blue-600 transition"
-                  >
-                    Meus Ingressos
-                  </Link>
+                  {perfil !== 'Admin' && (
+                    <Link 
+                      to="/perfil" 
+                      className="text-sm font-bold text-gray-600 hover:text-blue-600 transition"
+                    >
+                      Meus Ingressos
+                    </Link>
+                  )}
 
                   <div className="text-right hidden sm:block ml-4">
                     <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">Bem-vindo</p>
@@ -74,7 +76,7 @@ export default function Navbar() {
                 </Link>
                 <Link 
                   to="/registrar" 
-                  className="bg-blue-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-700 shadow-lg shadow-blue-100 transition"
+                  className="bg-blue-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-700 "
                 >
                   Criar Conta
                 </Link>

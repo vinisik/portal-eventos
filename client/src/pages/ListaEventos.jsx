@@ -58,20 +58,18 @@ export default function ListaEventos() {
     const porcentagemDisponivel = (vagasDisponiveis / vagasTotais) * 100;
     const isEscasso = vagasDisponiveis > 0 && (porcentagemDisponivel <= 20 || vagasDisponiveis <= 10);
 
-    if (agora > dataEvento) return { status: "ENCERRADO", textoBadge: "Encerrado", corBadge: "bg-gray-200 text-gray-600", mostrarEscassez: false, vagasDisponiveis };
-    if (agora < dataAbertura) return { status: "EM_BREVE", textoBadge: `Inscrições abertas em ${dataAbertura.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}`, corBadge: "bg-amber-100 text-amber-700", mostrarEscassez: false, vagasDisponiveis };
-    if (vagasDisponiveis <= 0) return { status: "ESGOTADO", textoBadge: "Esgotado", corBadge: "bg-red-100 text-red-700", mostrarEscassez: false, vagasDisponiveis };
+    if (agora > dataEvento) return { status: "ENCERRADO", textoBadge: "Encerrado", corBadge: "bg-gray-200 text-gray-600", mostrarRestantes: false, vagasDisponiveis };
+    if (agora < dataAbertura) return { status: "EM_BREVE", textoBadge: `Inscrições Abertas em ${dataAbertura.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}`, corBadge: "bg-amber-100 text-amber-700", mostrarRestantes: false, vagasDisponiveis };
+    if (vagasDisponiveis <= 0) return { status: "ESGOTADO", textoBadge: "Esgotado", corBadge: "bg-red-100 text-red-700", mostrarRestantes: false, vagasDisponiveis };
 
-    return { status: "ABERTO", textoBadge: "Inscrições Abertas", corBadge: "bg-green-100 text-green-700", mostrarEscassez: isEscasso, vagasDisponiveis };
+    return { status: "ABERTO", textoBadge: "Inscrições Abertas", corBadge: "bg-green-100 text-green-700", mostrarRestantes: isEscasso, vagasDisponiveis };
   };
 
   const eventosFiltrados = eventos.filter(evento => {
-    // Verifica se o termo digitado existe no título ou descrição
     const termoLower = termoBusca.toLowerCase();
     const matchBusca = evento.titulo.toLowerCase().includes(termoLower) || 
                        evento.descricao.toLowerCase().includes(termoLower);
     
-    // Verifica a categoria 
     const catEvento = evento.categoria || 'Outros';
     const matchCategoria = categoriaAtiva === 'Todas' || catEvento === categoriaAtiva;
     
@@ -95,9 +93,7 @@ export default function ListaEventos() {
         )}
       </div>
 
-      {/* Painel de Busca e Filtros */}
       <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-8 space-y-4">
-        {/* Barra de Pesquisa */}
         <div className="relative">
           <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -111,7 +107,6 @@ export default function ListaEventos() {
           />
         </div>
 
-        {/* Tags de Categoria */}
         <div className="flex overflow-x-auto gap-2 pb-2 scrollbar-hide">
           {categorias.map(categoria => (
             <button
@@ -129,7 +124,6 @@ export default function ListaEventos() {
         </div>
       </div>
 
-      {/* Resultados */}
       {eventosFiltrados.length === 0 ? (
         <div className="bg-white p-12 rounded-xl border border-dashed border-gray-300 text-center text-gray-500">
           <p className="text-lg font-medium text-gray-800">Nenhum evento encontrado.</p>
@@ -144,53 +138,74 @@ export default function ListaEventos() {
             const estado = analisarEstadoEvento(evento);
 
             return (
-              <div key={evento.id} className="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col hover:shadow-lg transition-shadow duration-300 overflow-hidden">
-                <div className="h-48 w-full bg-gray-100 relative">
-                  {evento.imagemUrl ? (
-                    <img src={evento.imagemUrl} alt={evento.titulo} className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">Sem Imagem</div>
-                  )}
+              <div key={evento.id} className="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden group">
+                
+                <Link to={`/evento/${evento.id}`} className="flex flex-col flex-grow">
                   
-                  <div className="absolute top-3 left-3 flex flex-col gap-2 shadow-sm">
-                    {/* Badge de Categoria na imagem */}
-                    <span className="bg-white/90 backdrop-blur text-gray-800 border border-gray-200 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider w-max shadow-sm">
-                      {evento.categoria || 'Outros'}
-                    </span>
-                    <span className={`px-3 py-1 rounded-full text-xs font-bold w-max shadow-md ${estado.corBadge}`}>
-                      {estado.textoBadge}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="p-6 flex-grow flex flex-col">
-                  <h3 className="text-xl font-bold text-gray-800 mb-2 line-clamp-1">{evento.titulo}</h3>
-                  <p className="text-gray-600 text-sm mb-6 line-clamp-2 leading-relaxed">{evento.descricao}</p>
-                  
-                  <div className="space-y-3 mb-6 flex-grow">
-                    <div className="flex items-center text-sm text-gray-500">
-                      <span className="bg-gray-100 p-1.5 rounded mr-3">📅</span>
-                      <span>{formatarData(evento.data)}</span>
+                  <div className="h-48 w-full bg-gray-100 relative overflow-hidden">
+                    {evento.imagemUrl ? (
+                      <img 
+                        src={evento.imagemUrl} 
+                        alt={evento.titulo} 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">Sem Imagem</div>
+                    )}
+                    
+                    <div className="absolute top-3 left-3 flex flex-col gap-2 shadow-sm z-10">
+                      <span className="bg-white/90 backdrop-blur text-gray-800 border border-gray-200 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider w-max shadow-sm">
+                        {evento.categoria || 'Outros'}
+                      </span>
+                      <span className={`px-3 py-1 rounded-full text-xs font-bold w-max shadow-md ${estado.corBadge}`}>
+                        {estado.textoBadge}
+                      </span>
                     </div>
                   </div>
 
-                  {estado.mostrarEscassez && (
-                    <div className="mb-4 bg-orange-50 border border-orange-200 rounded-lg p-2 text-center">
-                        <span className="animate-pulse text-orange-600 text-xs font-black uppercase tracking-widest">🔥 Apenas {estado.vagasDisponiveis} vagas!</span>
+                  <div className="p-6 flex-grow flex flex-col">
+                    <h3 className="text-xl font-bold text-gray-800 mb-2 line-clamp-1 group-hover:text-blue-600 transition-colors">
+                      {evento.titulo}
+                    </h3>
+                    
+                    <p className="text-gray-600 text-sm mb-6 line-clamp-2 leading-relaxed">
+                      {evento.descricao}
+                    </p>
+                    
+                    <div className="space-y-3 mb-6 flex-grow">
+                      <div className="flex items-center text-sm text-gray-500">
+                        <span className="bg-gray-100 p-1.5 rounded mr-3">📅</span>
+                        <span>{formatarData(evento.data)}</span>
+                      </div>
                     </div>
-                  )}
 
-                  <Link to={`/evento/${evento.id}`} className="block text-center w-full bg-gray-900 text-white font-semibold py-3 rounded-lg hover:bg-black transition-colors mb-4">
-                    Ver Detalhes
-                  </Link> 
+                    {estado.mostrarRestantes && (
+                      <div className="mb-2 bg-orange-50 border border-orange-200 rounded-lg p-2 text-center">
+                          <span className="text-orange-600 text-xs font-black uppercase tracking-widest">Restam {estado.vagasDisponiveis} vagas!</span>
+                      </div>
+                    )}
+                  </div>
+                </Link>
 
-                  {isAdmin && (
-                    <div className="mt-2 pt-5 border-t border-gray-100 flex gap-2">
-                      <Link to={`/admin/evento/${evento.id}/editar`} className="flex-1 text-center text-xs font-bold text-amber-600 border border-amber-200 py-2 rounded-md hover:bg-amber-50">Editar</Link>
-                      <button onClick={() => handleExcluir(evento.id, evento.titulo)} className="flex-1 text-center text-xs font-bold text-red-500 border border-red-100 py-2 rounded-md hover:bg-red-50">Excluir</button>
+                {/* Área do Admin */}
+                {isAdmin && (
+                  <div className="px-6 pb-6 pt-0 bg-white relative z-20">
+                    <div className="pt-4 border-t border-gray-100 flex gap-2">
+                      <Link 
+                        to={`/admin/evento/${evento.id}/editar`} 
+                        className="flex-1 text-center text-xs font-bold text-amber-600 border border-amber-200 py-2 rounded-md bg-amber-50 transition-colors"
+                      >
+                        Editar
+                      </Link>
+                      <button 
+                        onClick={() => handleExcluir(evento.id, evento.titulo)} 
+                        className="flex-1 text-center text-xs font-bold text-red-500 border border-red-100 py-2 rounded-md bg-red-50 transition-colors"
+                      >
+                        Excluir
+                      </button>
                     </div>
-                  )}         
-                </div>
+                  </div>
+                )}         
               </div>
             );
           })}
