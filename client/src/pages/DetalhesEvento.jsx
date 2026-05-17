@@ -1,21 +1,23 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api/axiosConfig'; 
 
 export default function DetalhesEvento() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [evento, setEvento] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [jaInscrito, setJaInscrito] = useState(false); 
 
+  // Busca os dados do evento
   useEffect(() => {
     const buscarEvento = async () => {
       try {
-        const res = await axios.get('http://localhost:5065/api/eventos');
+        const res = await api.get('/eventos');
         const encontrado = res.data.find(e => e.id === parseInt(id));
         setEvento(encontrado);
       } catch (error) {
-        console.error("Erro:", error);
+        console.error("Erro ao buscar evento:", error);
       } finally {
         setLoading(false);
       }
@@ -23,7 +25,22 @@ export default function DetalhesEvento() {
     buscarEvento();
   }, [id]);
 
-  if (loading) return <div className="text-center mt-20">A carregar detalhes...</div>;
+  // Verifica se o usuário já possui o ingresso
+  useEffect(() => {
+    const verificarInscricao = async () => {
+      if (!evento) return; 
+
+      try {
+        const response = await api.get('/auth/meus-ingressos');
+        const inscrito = response.data.some(ingresso => ingresso.eventoId === evento.id);
+        setJaInscrito(inscrito);
+      } catch (error) {
+      }
+    };
+    verificarInscricao();
+  }, [evento]);
+
+  if (loading) return <div className="text-center mt-20">Carregando detalhes...</div>;
   if (!evento) return <div className="text-center mt-20">Evento não encontrado.</div>;
 
   const agora = new Date();
@@ -38,18 +55,19 @@ export default function DetalhesEvento() {
   const porcentagemDisponivel = (vagasDisponiveis / vagasTotais) * 100;
   const isEscasso = vagasDisponiveis > 0 && (porcentagemDisponivel <= 20 || vagasDisponiveis <= 10);
 
-  // Define o estado da inscrição com base nas condições do evento
   let statusInscricao = { ativo: false, texto: "", corBotao: "bg-gray-300 text-gray-500 cursor-not-allowed", mensagem: "" };
 
-  if (agora > dataEvento) {
-      statusInscricao = { ativo: false, texto: "Evento Encerrado", corBotao: "bg-gray-300 text-gray-500", mensagem: "Este evento já aconteceu." };
+  if (jaInscrito) {
+      statusInscricao = { ativo: false, texto: "✓ Inscrito", corBotao: "bg-green-500 text-white opacity-90 cursor-not-allowed shadow-inner", mensagem: "O seu lugar neste evento encontra-se assegurado." };
+  } else if (agora > dataEvento) {
+      statusInscricao = { ativo: false, texto: "Evento Encerrado", corBotao: "bg-gray-300 text-gray-500", mensagem: "Este evento já foi realizado." };
   } else if (agora < dataAbertura) {
       const formataData = dataAbertura.toLocaleString('pt-BR', { day: '2-digit', month: 'long', hour: '2-digit', minute: '2-digit' });
       statusInscricao = { ativo: false, texto: "Em Breve", corBotao: "bg-amber-100 text-amber-700", mensagem: `Inscrições abrem em ${formataData}` };
   } else if (vagasDisponiveis <= 0) {
-      statusInscricao = { ativo: false, texto: "Esgotado", corBotao: "bg-red-100 text-red-700 font-bold", mensagem: "Infelizmente todas as vagas foram preenchidas." };
+      statusInscricao = { ativo: false, texto: "Esgotado", corBotao: "bg-red-100 text-red-700 font-bold", mensagem: "Infelizmente, todas as vagas encontram-se preenchidas." };
   } else {
-      statusInscricao = { ativo: true, texto: "Inscrever-se", corBotao: "bg-blue-600 hover:bg-blue-700 text-white", mensagem: isEscasso ? `🔥 Restam apenas ${vagasDisponiveis} vagas.` : "Vagas disponíveis. Garanta o seu lugar." };
+      statusInscricao = { ativo: true, texto: "Inscrever-se", corBotao: "bg-blue-600 hover:bg-blue-700 text-white", mensagem: isEscasso ? `🔥 Restam apenas ${vagasDisponiveis} vagas.` : "Vagas disponíveis. Garanta a sua participação." };
   }
 
   return (
@@ -78,7 +96,7 @@ export default function DetalhesEvento() {
         
         <h1 className="text-4xl font-extrabold text-gray-900 mb-4">{evento.titulo}</h1>
         
-        {/* Nova Etiqueta de Categoria */}
+        {/* Etiqueta de Categoria */}
         <div className="flex items-center gap-2 mb-6">
           <span className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest border border-blue-100">
             {evento.categoria || 'Outros'}
@@ -118,10 +136,10 @@ export default function DetalhesEvento() {
         </div>
 
         {/* ÁREA DE AÇÃO DINÂMICA */}
-        <div className={`p-6 rounded-xl border flex flex-col sm:flex-row items-center justify-between gap-4 transition-colors ${statusInscricao.ativo ? 'bg-gray-50 border-gray-200' : 'bg-gray-100 border-gray-200'}`}>
+        <div className={`p-6 rounded-xl border flex flex-col sm:flex-row items-center justify-between gap-4 transition-colors ${statusInscricao.ativo || jaInscrito ? 'bg-gray-50 border-gray-200' : 'bg-gray-100 border-gray-200'}`}>
           <div>
             <p className="font-bold text-gray-800">
-              {statusInscricao.ativo ? 'Garanta seu ingresso agora' : 'Inscrições Indisponíveis'}
+              {jaInscrito ? 'Inscrição Confirmada' : statusInscricao.ativo ? 'Garanta seu ingresso agora' : 'Inscrições Indisponíveis'}
             </p>
             <p className={`text-sm font-medium mt-1 ${isEscasso && statusInscricao.ativo ? 'text-orange-600 animate-pulse' : 'text-gray-500'}`}>
               {statusInscricao.mensagem}
