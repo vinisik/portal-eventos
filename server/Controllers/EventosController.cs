@@ -79,13 +79,34 @@ namespace PortalEventos.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutEvento(int id, Evento eventoAtualizado)
+        public async Task<IActionResult> PutEvento(int id, Evento eventoInput)
         {
-            // Verifica se o ID do URL corresponde ao ID do objeto enviado
-            if (id != eventoAtualizado.Id) return BadRequest("IDs não correspondem.");
+            if (id != eventoInput.Id) return BadRequest("IDs não correspondem.");
 
-            // Informa o Entity Framework que este objeto foi modificado
-            _context.Entry(eventoAtualizado).State = EntityState.Modified;
+            // Busca o registro original direto do banco para evitar conflitos de rastreamento (tracking)
+            var eventoBanco = await _context.Eventos.FirstOrDefaultAsync(e => e.Id == id);
+            if (eventoBanco == null) return NotFound("Evento não encontrado.");
+
+            if (eventoInput.Destaque)
+            {
+                var outrosDestaques = await _context.Eventos.Where(e => e.Destaque && e.Id != id).ToListAsync();
+                foreach (var d in outrosDestaques)
+                {
+                    d.Destaque = false; // Remove o destaque de qualquer outro evento anterior
+                }
+            }
+
+            // Atualiza os campos do objeto monitorado pelo contexto
+            eventoBanco.Titulo = eventoInput.Titulo;
+            eventoBanco.Descricao = eventoInput.Descricao;
+            eventoBanco.Data = eventoInput.Data;
+            eventoBanco.ImagemUrl = eventoInput.ImagemUrl;
+            eventoBanco.CapacidadeMaxima = eventoInput.CapacidadeMaxima;
+            eventoBanco.IdadeMinima = eventoInput.IdadeMinima;
+            eventoBanco.DataAberturaInscricoes = eventoInput.DataAberturaInscricoes;
+            eventoBanco.Categoria = eventoInput.Categoria;
+            eventoBanco.ValorIngresso = eventoInput.ValorIngresso;
+            eventoBanco.Destaque = eventoInput.Destaque; 
 
             try
             {
@@ -93,7 +114,6 @@ namespace PortalEventos.Api.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                // Verifica se o evento ainda existe no banco
                 if (!_context.Eventos.Any(e => e.Id == id)) return NotFound("Evento não encontrado.");
                 else throw;
             }

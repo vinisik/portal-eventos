@@ -66,7 +66,7 @@ export default function ListaEventos() {
 
   // Lógica de separação do Destaque
   const semFiltrosAtivos = termoBusca === '' && categoriaAtiva === 'Todas';
-  const eventoDestaque = eventos.find(e => e.destaque);
+  const eventoDestaque = eventos.find(e => e.destaque === true || e.Destaque === true);
 
   const eventosFiltrados = eventos.filter(evento => {
     // Esconde o destaque da grelha se o banner já estiver a ser exibido
@@ -95,6 +95,7 @@ export default function ListaEventos() {
         {isAdmin && <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Modo Admin</span>}
       </div>
 
+      {/* Busca e Filtros */}
       <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-8 transition-all">
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-grow">
@@ -141,7 +142,7 @@ export default function ListaEventos() {
         )}
       </div>
 
-      {/* Evento em Destque */}
+      {/* Evento em Destaque */}
       {semFiltrosAtivos && eventoDestaque && (
         <div className="mb-12 relative rounded-2xl overflow-hidden shadow-2xl bg-gray-900 group">
           <div className="absolute inset-0">
@@ -166,7 +167,7 @@ export default function ListaEventos() {
               {eventoDestaque.descricao}
             </p>
             
-            <div className="flex flex-wrap items-center gap-4">
+            <div className="flex flex-wrap items-center gap-4 w-full">
               <Link to={`/evento/${eventoDestaque.id}`} className="bg-white text-gray-900 hover:bg-gray-100 px-8 py-3 rounded-lg font-bold transition-colors shadow-lg">
                 Garantir o Ingresso
               </Link>
@@ -177,6 +178,23 @@ export default function ListaEventos() {
                   {eventoDestaque.valorIngresso === 0 ? 'GRATUITO' : `R$ ${eventoDestaque.valorIngresso.toFixed(2).replace('.', ',')}`}
                 </span>
               </div>
+
+              {isAdmin && (
+                <div className="flex gap-2 sm:ml-auto mt-2 sm:mt-0">
+                  <Link 
+                    to={`/admin/evento/${eventoDestaque.id}/editar`} 
+                    className="bg-amber-500 hover:bg-amber-600 text-white px-5 py-3 rounded-lg font-bold transition-colors shadow-lg text-sm"
+                  >
+                    Editar Destaque
+                  </Link>
+                  <button 
+                    onClick={() => handleExcluir(eventoDestaque.id, eventoDestaque.titulo)} 
+                    className="bg-red-600 hover:bg-red-700 text-white px-5 py-3 rounded-lg font-bold transition-colors shadow-lg text-sm"
+                  >
+                    Excluir
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
