@@ -22,7 +22,7 @@ namespace PortalEventos.Api.Services
             var linkConfirmacao = $"http://localhost:5173/confirmar-email?token={token}";
 
             var mensagem = new MimeMessage();
-            mensagem.From.Add(new MailboxAddress("Portal de Eventos", "portaleventossistema@gmail.com"));
+            mensagem.From.Add(new MailboxAddress("Portal de Eventos", "siqueiravini29@gmail.com"));
             mensagem.To.Add(new MailboxAddress(nomeUsuario, emailDestinatario));
             mensagem.Subject = "Ative a sua conta no Portal de Eventos";
 
@@ -51,14 +51,14 @@ namespace PortalEventos.Api.Services
         public async Task EnviarIngressoAsync(string emailDestinatario, string nomeUsuario, string nomeEvento, string ticketHash, decimal valorIngresso)
         {
             var mensagem = new MimeMessage();
-            mensagem.From.Add(new MailboxAddress("Portal de Eventos", "portaleventossistema@gmail.com")); 
+            mensagem.From.Add(new MailboxAddress("Portal de Eventos", "siqueiravini29@gmail")); 
             mensagem.To.Add(new MailboxAddress(nomeUsuario, emailDestinatario));
             mensagem.Subject = $"Confirmação de Inscrição: {nomeEvento}";
 
             // Lógica para formatação do preço
             string valorFormatado = valorIngresso == 0 ? "GRATUITO" : $"R$ {valorIngresso:F2}";
             
-            // URL do ingresso no React
+            // URL do ingresso no seu React
             string urlTicket = $"http://localhost:5173/ticket/{ticketHash}";
             
             // URL da imagem gerada dinamicamente pelo QR Server
@@ -109,7 +109,7 @@ namespace PortalEventos.Api.Services
                 // Configuração específica para o Gmail 
                 await client.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
                 
-                await client.AuthenticateAsync("portaleventossistema@gmail.com", "fysa iesi jixz xnus ");
+                await client.AuthenticateAsync("siqueiravini29@gmail.com", "fysa iesi jixz xnus ");
                 
                 await client.SendAsync(mensagem);
                 await client.DisconnectAsync(true);
