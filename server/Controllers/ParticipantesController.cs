@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using PortalEventos.Api.Data;
 using PortalEventos.Api.Models;
 using PortalEventos.Api.Services;
+using System.Security.Claims;
 
 namespace PortalEventos.Api.Controllers
 {
@@ -21,31 +22,53 @@ namespace PortalEventos.Api.Controllers
         }
 
         // Inscrição online
+        [Authorize] 
         [HttpPost]
-        public async Task<ActionResult<Participante>> PostParticipante(Participante user)
+        public async Task<IActionResult> PostParticipante([FromBody] InscricaoRequest request)
         {
-            // Verifica se o evento realmente existe
-            var evento = await _context.Eventos.FindAsync(user.EventoId);
+            // Extrai a identificação do Usuário do Token 
+            var identificacaoUsuario = User.FindFirst(ClaimTypes.Email)?.Value 
+                                       ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value 
+                                       ?? User.FindFirst("email")?.Value 
+                                       ?? User.Identity?.Name;
+
+            if (string.IsNullOrEmpty(identificacaoUsuario))
+            {
+                return Unauthorized("Usuário não autenticado ou token inválido.");
+            }
+
+            // Busca o Usuário
+            var usuarioConta = await _context.Usuarios.FirstOrDefaultAsync(u => 
+                u.Email == identificacaoUsuario || 
+                u.Nome == identificacaoUsuario);
+
+            if (usuarioConta == null && int.TryParse(identificacaoUsuario, out int userId))
+            {
+                usuarioConta = await _context.Usuarios.FindAsync(userId);
+            }
+
+            // Se mesmo após as duas tentativas não encontrar, retorna o erro detalhado
+            if (usuarioConta == null) 
+            {
+                return NotFound($"Usuário '{identificacaoUsuario}' não foi encontrado na base de dados.");
+            }
+
+            var evento = await _context.Eventos.FindAsync(request.EventoId);
             if (evento == null) return NotFound("Evento não encontrado.");
 
             if (DateTime.Now < evento.DataAberturaInscricoes)
             {
-                return BadRequest($"As inscrições para este evento só abrem em: {evento.DataAberturaInscricoes:dd/MM/yyyy às HH:mm}.");
+                return BadRequest($"As inscrições para este evento só abrem a: {evento.DataAberturaInscricoes:dd/MM/yyyy às HH:mm}.");
             }
 
             // Verifica se ainda há vagas
-            var totalInscritos = await _context.Participantes.CountAsync(p => p.EventoId == user.EventoId);
+            var totalInscritos = await _context.Participantes.CountAsync(p => p.EventoId == request.EventoId);
             if (totalInscritos >= evento.CapacidadeMaxima) return BadRequest("As vagas para este evento estão esgotadas.");
 
             // Validação de Idade 
             if (evento.IdadeMinima > 0) 
             {
-                var usuarioConta = await _context.Usuarios.FirstOrDefaultAsync(u => u.Email == user.Email);
-                
-                if (usuarioConta == null) 
-                    return BadRequest($"A idade mínima para este evento é de {evento.IdadeMinima} anos. Crie uma conta no portal.");
-
-                // Cálculo dinâmico da idade baseado na DataNascimento
+                // Cálculo dinâmico da idade baseado na DataNascimento do Usuário logado
                 var hoje = DateTime.Today;
                 var idadeCalculada = hoje.Year - usuarioConta.DataNascimento.Year;
                 
@@ -58,28 +81,43 @@ namespace PortalEventos.Api.Controllers
 
             // Trava de Inscrição Duplicada
             bool jaInscrito = await _context.Participantes
-                .AnyAsync(p => p.EventoId == user.EventoId && p.Email == user.Email);
+                .AnyAsync(p => p.EventoId == request.EventoId && p.Email == usuarioConta.Email);
 
             if (jaInscrito)
             {
-                return BadRequest("Você já está inscrito neste evento! Acesse a aba 'Meus Ingressos' no seu perfil para ver o seu ingresso.");
+                return BadRequest("Já se encontra inscrito neste evento! Aceda à aba 'Meus Ingressos' no seu perfil para ver o seu ingresso.");
             }
 
-            // Salva a inscrição no banco
-            _context.Participantes.Add(user);
+            var participante = new Participante
+            {
+                EventoId = evento.Id,
+                Nome = usuarioConta.Nome,
+                Email = usuarioConta.Email,
+                TicketHash = Guid.NewGuid().ToString() 
+            };
+
+            // Salva a inscrição na base de dados
+            _context.Participantes.Add(participante);
             await _context.SaveChangesAsync();
 
             // Disparo do e-mail de confirmação
-            await _emailService.EnviarIngressoAsync(
-                user.Email,
-                user.Nome,
-                evento.Titulo,
-                user.TicketHash, 
-                evento.ValorIngresso 
-            );
+            try
+            {
+                await _emailService.EnviarIngressoAsync(
+                    usuarioConta.Email,
+                    usuarioConta.Nome,
+                    evento.Titulo,
+                    participante.TicketHash, 
+                    evento.ValorIngresso 
+                );
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro ao enviar e-mail: {ex.Message}");
+            }
 
-            // Retorna os dados do usuário inscrito 
-            return Ok(user);
+            // Retorna os dados do ingresso gerado
+            return Ok(participante);
         }
 
         [AllowAnonymous] 
@@ -93,7 +131,6 @@ namespace PortalEventos.Api.Controllers
             if (participante == null) 
                 return NotFound("Ingresso não encontrado.");
 
-            // Devolve apenas os dados necessários para o PDF
             return Ok(new {
                 nome = participante.Nome,
                 email = participante.Email,
@@ -104,4 +141,6 @@ namespace PortalEventos.Api.Controllers
             });
         }
     }
+
+    public record InscricaoRequest(int EventoId);
 }
