@@ -15,7 +15,8 @@ export default function NovoEvento() {
         imagemUrl: '',   
         idadeMinima: '0',
         categoria: 'Outros',
-        valorIngresso: '0'
+        valorIngresso: '0',
+        destaque: false 
     });
 
     const handleChange = (e) => {
@@ -27,12 +28,12 @@ export default function NovoEvento() {
         setLoading(true);
 
         try {
-            // Envio com conversão de tipos para evitar Bad Request
             await axios.post('http://localhost:5065/api/eventos', {
                 ...formData,
                 capacidadeMaxima: parseInt(formData.capacidadeMaxima),
                 idadeMinima: parseInt(formData.idadeMinima),
-                valorIngresso: parseFloat(formData.valorIngresso), 
+                valorIngresso: parseFloat(formData.valorIngresso),
+                destaque: formData.destaque,
                 dataAberturaInscricoes: formData.dataAberturaInscricoes || new Date().toISOString()
             });
 
@@ -56,14 +57,15 @@ export default function NovoEvento() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
-                {/* Preview dinâmico da Imagem */}
+                
+                {/* Preview da Imagem por URL */}
                 {formData.imagemUrl && (
                   <div className="mb-4">
                     <p className="text-xs font-bold text-gray-400 uppercase mb-2">Preview do Banner</p>
                     <img 
                       src={formData.imagemUrl} 
                       alt="Preview" 
-                      className="w-full h-32 object-cover rounded-lg border border-gray-200" 
+                      className="w-full h-40 object-cover rounded-lg border border-gray-200 shadow-sm" 
                     />
                   </div>
                 )}
@@ -71,7 +73,7 @@ export default function NovoEvento() {
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">URL da Imagem (Banner)</label>
                     <input
-                        type="text" name="imagemUrl"
+                        type="url" name="imagemUrl"
                         value={formData.imagemUrl} onChange={handleChange}
                         className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 outline-none transition"
                         placeholder="Ex: https://suaimagem.com/foto.jpg"
@@ -98,7 +100,6 @@ export default function NovoEvento() {
                     ></textarea>
                 </div>
 
-                {/* Grelha atualizada para acomodar o Preço */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Data e Hora do Evento</label>
@@ -119,7 +120,6 @@ export default function NovoEvento() {
                         <p className="text-[10px] text-gray-400 mt-1">Deixe em branco para abrir imediatamente.</p>
                     </div>
 
-                    {/*  Preço do Ingresso */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Preço do Ingresso (R$)</label>
                         <input
@@ -155,7 +155,6 @@ export default function NovoEvento() {
                         </select>
                     </div>
 
-                    {/* Seleção de Categoria */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Categoria do Evento</label>
                         <select 
@@ -171,13 +170,30 @@ export default function NovoEvento() {
                             <option value="Outros">Outros</option>
                         </select>
                     </div>
+
+                    {/* Toggle de Evento em Destaque */}
+                    <div className="md:col-span-2 bg-blue-50 border border-blue-100 p-4 rounded-lg flex items-center justify-between mt-2">
+                        <div>
+                            <label className="font-bold text-blue-900 block">⭐ Marcar como Evento em Destaque</label>
+                            <p className="text-xs text-blue-700 mt-1">Este evento aparecerá com um banner gigante no topo da página inicial.</p>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                            <input 
+                                type="checkbox" name="destaque"
+                                checked={formData.destaque} 
+                                onChange={(e) => setFormData({...formData, destaque: e.target.checked})}
+                                className="sr-only peer"
+                            />
+                            <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                    </div>
                 </div>
 
                 <button
                     type="submit" disabled={loading}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-md transition disabled:bg-blue-400 mt-4 shadow-lg shadow-blue-100"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-md transition disabled:bg-gray-400 mt-4 shadow-lg shadow-blue-100"
                 >
-                    {loading ? 'A Guardar...' : 'Criar Evento'}
+                    {loading ? 'Salvando alterações...' : 'Criar Evento'}
                 </button>
             </form>
         </div>

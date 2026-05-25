@@ -33,7 +33,8 @@ namespace PortalEventos.Api.Controllers
                     e.DataAberturaInscricoes,
                     VagasOcupadas = e.Participantes.Count(),
                     Categoria = e.Categoria ?? "Outros",
-                    ValorIngresso = e.ValorIngresso
+                    ValorIngresso = e.ValorIngresso,
+                    Destaque = e.Destaque
                 })
                 .ToListAsync();
 
@@ -45,6 +46,18 @@ namespace PortalEventos.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<Evento>> PostEvento(Evento evento)
         {
+
+            if (evento.Destaque)
+            {
+                // Busca todos os eventos que atualmente estão em destaque 
+                var destaquesAtuais = await _context.Eventos.Where(e => e.Destaque).ToListAsync();
+                foreach (var d in destaquesAtuais)
+                {
+                    d.Destaque = false; 
+                    _context.Entry(d).State = EntityState.Modified;
+                }
+            }
+
             _context.Eventos.Add(evento);
             await _context.SaveChangesAsync();
 

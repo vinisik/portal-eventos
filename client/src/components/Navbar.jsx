@@ -21,7 +21,7 @@ export default function Navbar() {
           
           {/* Logo / Home */}
           <div className="flex-shrink-0 flex items-center">
-            <Link to="/" className="text-2xl font-black text-blue-600 tracking-tighter">
+            <Link to="/" className="text-4xl font-black text-blue-600 tracking-tighter">
               PORTAL<span className="text-gray-900">EVENTOS</span>
             </Link>
           </div>

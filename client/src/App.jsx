@@ -30,7 +30,7 @@ export default function App() {
     <Router>
       <Navbar />
       
-      <main className="max-w-7xl mx-auto px-4 mt-8">
+      <main className="max-w-full mx-auto px-4 mt-8">
         <Routes>
           <Route path="/" element={<ListaEventos />} />
           <Route path="/ticket/:hash" element={<VisualizarIngresso />} />

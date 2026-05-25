@@ -16,7 +16,9 @@ export default function EditarEvento() {
     capacidadeMaxima: '',
     imagemUrl: '',    
     idadeMinima: '0',
-    categoria: 'Outros' 
+    categoria: 'Outros',
+    valorIngresso: '0', // 👇 Adicionado para não perder o preço na edição
+    destaque: false     // 👇 Adicionado para o Destaque
   });
 
   useEffect(() => {
@@ -34,7 +36,9 @@ export default function EditarEvento() {
               : '',
             idadeMinima: eventoEncontrado.idadeMinima.toString(),
             imagemUrl: eventoEncontrado.imagemUrl || '',
-            categoria: eventoEncontrado.categoria || 'Outros' 
+            categoria: eventoEncontrado.categoria || 'Outros',
+            valorIngresso: eventoEncontrado.valorIngresso || 0, // Carrega o preço existente
+            destaque: eventoEncontrado.destaque || false // Carrega o estado de destaque
           });
         }
       } catch (error) {
@@ -57,6 +61,8 @@ export default function EditarEvento() {
         ...formData,
         capacidadeMaxima: parseInt(formData.capacidadeMaxima),
         idadeMinima: parseInt(formData.idadeMinima),
+        valorIngresso: parseFloat(formData.valorIngresso), // Salva o preço corretamente
+        destaque: formData.destaque, // Salva o estado do destaque
         dataAberturaInscricoes: formData.dataAberturaInscricoes || new Date().toISOString()
       });
       
@@ -84,7 +90,7 @@ export default function EditarEvento() {
             <img 
               src={formData.imagemUrl} 
               alt="Preview" 
-              className="w-full h-32 object-cover rounded-lg border border-gray-200" 
+              className="w-full h-40 object-cover rounded-lg border border-gray-200 shadow-sm" 
             />
           </div>
         )}
@@ -92,26 +98,26 @@ export default function EditarEvento() {
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">URL da Imagem (Banner)</label>
           <input 
-            type="text" name="imagemUrl" value={formData.imagemUrl} onChange={handleChange} 
-            className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 outline-none"
+            type="url" name="imagemUrl" value={formData.imagemUrl} onChange={handleChange} 
+            className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 outline-none transition"
             placeholder="Cole o link da imagem (Ex: Unsplash, Imgur...)"
           />
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Título</label>
-          <input type="text" required name="titulo" value={formData.titulo} onChange={handleChange} className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 outline-none" />
+          <input type="text" required name="titulo" value={formData.titulo} onChange={handleChange} className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 outline-none transition" />
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Descrição</label>
-          <textarea required name="descricao" rows="4" value={formData.descricao} onChange={handleChange} className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+          <textarea required name="descricao" rows="4" value={formData.descricao} onChange={handleChange} className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 outline-none transition"></textarea>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Data e Hora do Evento</label>
-            <input type="datetime-local" required name="data" value={formData.data} onChange={handleChange} className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 outline-none" />
+            <input type="datetime-local" required name="data" value={formData.data} onChange={handleChange} className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 outline-none transition" />
           </div>
 
           <div>
@@ -119,21 +125,32 @@ export default function EditarEvento() {
             <input 
               type="datetime-local" name="dataAberturaInscricoes" 
               value={formData.dataAberturaInscricoes} onChange={handleChange} 
-              className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 outline-none" 
+              className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 outline-none transition" 
             />
             <p className="text-[10px] text-gray-400 mt-1">Deixe em branco para manter a abertura imediata.</p>
           </div>
           
           <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Preço do Ingresso (R$)</label>
+              <input
+                  type="number" min="0" step="0.01" required name="valorIngresso"
+                  value={formData.valorIngresso} onChange={handleChange}
+                  className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 outline-none transition"
+                  placeholder="0,00"
+              />
+              <p className="text-[10px] text-gray-400 mt-1">Deixe 0 para eventos gratuitos.</p>
+          </div>
+
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Capacidade Total</label>
-            <input type="number" required min="1" name="capacidadeMaxima" value={formData.capacidadeMaxima} onChange={handleChange} className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 outline-none" />
+            <input type="number" required min="1" name="capacidadeMaxima" value={formData.capacidadeMaxima} onChange={handleChange} className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 outline-none transition" />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Classificação Indicativa</label>
             <select
                 name="idadeMinima" value={formData.idadeMinima} onChange={handleChange}
-                className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+                className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 outline-none transition bg-white"
             >
                 <option value="0">Livre para todos</option>
                 <option value="14">+14 Anos</option>
@@ -143,11 +160,11 @@ export default function EditarEvento() {
           </div>
 
           {/* Selecionar Categoria */}
-          <div className="md:col-span-2">
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Categoria do Evento</label>
             <select 
               name="categoria" value={formData.categoria} onChange={handleChange}
-              className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+              className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 outline-none transition bg-white"
             >
               <option value="Tecnologia">Tecnologia</option>
               <option value="Negócios">Negócios</option>
@@ -158,10 +175,27 @@ export default function EditarEvento() {
               <option value="Outros">Outros</option>
             </select>
           </div>
+
+          {/* Toggle de Evento em Destaque */}
+          <div className="md:col-span-2 bg-blue-50 border border-blue-100 p-4 rounded-lg flex items-center justify-between mt-2">
+              <div>
+                  <label className="font-bold text-blue-900 block">⭐ Marcar como Evento em Destaque</label>
+                  <p className="text-xs text-blue-700 mt-1">Este evento aparecerá com um banner gigante no topo da página inicial.</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                      type="checkbox" name="destaque"
+                      checked={formData.destaque} 
+                      onChange={(e) => setFormData({...formData, destaque: e.target.checked})}
+                      className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+          </div>
         </div>
 
         <button type="submit" disabled={loading} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-md mt-6 shadow-lg shadow-blue-100 transition-all">
-          {loading ? 'A Guardar Alterações...' : 'Confirmar Atualização'}
+          {loading ? 'Salvando alterações...' : 'Confirmar Atualização'}
         </button>
       </form>
     </div>

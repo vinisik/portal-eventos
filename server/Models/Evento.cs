@@ -11,6 +11,7 @@ namespace PortalEventos.Api.Models
         public int IdadeMinima { get; set; }
         public string Categoria { get; set; } = "Outros";
         public decimal ValorIngresso { get; set; } = 0;
+        public bool Destaque { get; set; } = false;
 
         // URL da imagem (temporario durante desenvolvimento)
         public string ImagemUrl { get; set; } = string.Empty;
