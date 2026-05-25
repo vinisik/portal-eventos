@@ -28,7 +28,7 @@ export default function Perfil() {
         return filtro === 'futuros' ? dataEvento >= agora : dataEvento < agora;
     });
 
-    if (loading) return <div className="text-center mt-20 text-gray-500">A carregar seu perfil...</div>;
+    if (loading) return <div className="text-center mt-20 text-gray-500">Carregando seu perfil...</div>;
 
     return (
         <div className="max-w-5xl mx-auto mb-10 bg-white p-8 rounded-2xl shadow-sm border border-gray-100">

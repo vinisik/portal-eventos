@@ -107,7 +107,7 @@ export default function FormularioPagamento() {
     finalizarInscricao();
   };
 
-  if (loading) return <div className="text-center mt-20">A carregar checkout...</div>;
+  if (loading) return <div className="text-center mt-20">Carregando checkout...</div>;
   if (!evento) return <div className="text-center mt-20">Evento não encontrado.</div>;
 
   const isGratuito = evento.valorIngresso === 0;
@@ -136,7 +136,7 @@ export default function FormularioPagamento() {
             onClick={finalizarInscricao} disabled={processandoPagamento}
             className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-xl transition shadow-lg"
           >
-            {processandoPagamento ? 'A Confirmar...' : 'Concluir Inscrição Gratuita'}
+            {processandoPagamento ? 'Confirmando...' : 'Concluir Inscrição Gratuita'}
           </button>
         </div>
       ) : (
