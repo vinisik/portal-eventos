@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using MailKit.Net.Smtp;
+using MailKit.Security;
 using MimeKit;
 using Microsoft.Extensions.Configuration;
 
@@ -21,7 +22,7 @@ namespace PortalEventos.Api.Services
             var linkConfirmacao = $"http://localhost:5173/confirmar-email?token={token}";
 
             var mensagem = new MimeMessage();
-            mensagem.From.Add(new MailboxAddress("Portal de Eventos", "noreply@portaleventos.com"));
+            mensagem.From.Add(new MailboxAddress("Portal de Eventos", "siqueiravini29@gmail.com"));
             mensagem.To.Add(new MailboxAddress(nomeUsuario, emailDestinatario));
             mensagem.Subject = "Ative a sua conta no Portal de Eventos";
 
@@ -50,7 +51,7 @@ namespace PortalEventos.Api.Services
         public async Task EnviarIngressoAsync(string emailDestinatario, string nomeUsuario, string nomeEvento)
         {
             var mensagem = new MimeMessage();
-            mensagem.From.Add(new MailboxAddress("Portal de Eventos", "noreply@portaleventos.com"));
+            mensagem.From.Add(new MailboxAddress("Portal de Eventos", "siqueiravini29@gmail.com"));
             mensagem.To.Add(new MailboxAddress(nomeUsuario, emailDestinatario));
             mensagem.Subject = $"Confirmação de Inscrição: {nomeEvento}";
 
@@ -77,9 +78,10 @@ namespace PortalEventos.Api.Services
             using var client = new SmtpClient();
             try
             {
-                await client.ConnectAsync("smtp.mailtrap.io", 587, false);
-                // Substituir pelas credenciais do mailtrap
-                await client.AuthenticateAsync("0d472385cf08ae", "4db8023cebd64a");
+                // Configuração específica para o Gmail 
+                await client.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
+                
+                await client.AuthenticateAsync("siqueiravini29@gmail.com", "fysa iesi jixz xnus ");
                 
                 await client.SendAsync(mensagem);
                 await client.DisconnectAsync(true);
