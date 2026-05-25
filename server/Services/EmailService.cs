@@ -48,22 +48,50 @@ namespace PortalEventos.Api.Services
         }
 
         // Disparo do Ingresso 
-        public async Task EnviarIngressoAsync(string emailDestinatario, string nomeUsuario, string nomeEvento)
+        public async Task EnviarIngressoAsync(string emailDestinatario, string nomeUsuario, string nomeEvento, string ticketHash, decimal valorIngresso)
         {
             var mensagem = new MimeMessage();
-            mensagem.From.Add(new MailboxAddress("Portal de Eventos", "siqueiravini29@gmail.com"));
+            mensagem.From.Add(new MailboxAddress("Portal de Eventos", "siqueiravini29@gmail.com")); 
             mensagem.To.Add(new MailboxAddress(nomeUsuario, emailDestinatario));
             mensagem.Subject = $"Confirmação de Inscrição: {nomeEvento}";
+
+            // Lógica para formatação do preço
+            string valorFormatado = valorIngresso == 0 ? "GRATUITO" : $"R$ {valorIngresso:F2}";
+            
+            // URL do ingresso no React
+            string urlTicket = $"http://localhost:5173/ticket/{ticketHash}";
+            
+            // URL da imagem gerada dinamicamente pelo QR Server
+            string urlQrCodeImagem = $"https://api.qrserver.com/v1/create-qr-code/?size=250x250&data={Uri.EscapeDataString(urlTicket)}";
 
             var bodyBuilder = new BodyBuilder
             {
                 HtmlBody = $@"
-                    <div style='font-family: sans-serif; padding: 20px; border: 1px solid #eee; max-width: 600px; border-radius: 8px;'>
-                        <h2 style='color: #2563eb;'>Olá, {nomeUsuario}!</h2>
-                        <p>A sua inscrição no evento <strong>{nomeEvento}</strong> foi confirmada com sucesso.</p>
-                        <p>O seu QR Code e os detalhes do ingresso já estão disponíveis na sua área logada no portal.</p>
-                        <br/>
-                        <small style='color: #64748b;'>Este é um e-mail automático, por favor não responda.</small>
+                    <div style='font-family: sans-serif; padding: 30px; border: 1px solid #e2e8f0; max-width: 600px; border-radius: 12px; margin: 0 auto; text-align: center;'>
+                        
+                        <h2 style='color: #1e40af; margin-bottom: 5px;'>Sua vaga está garantida!</h2>
+                        <p style='color: #475569; font-size: 16px;'>Olá, <strong>{nomeUsuario}</strong>!</p>
+                        <p style='color: #475569;'>A sua inscrição no evento <strong>{nomeEvento}</strong> foi confirmada com sucesso.</p>
+                        
+                        <div style='background-color: #f8fafc; border: 1px solid #cbd5e1; padding: 15px; border-radius: 8px; margin: 25px 0;'>
+                            <p style='margin: 0; color: #64748b; font-size: 14px;'>Total Pago</p>
+                            <p style='margin: 5px 0 0 0; font-size: 24px; font-weight: bold; color: #0f172a;'>{valorFormatado}</p>
+                        </div>
+
+                        <div style='margin: 30px 0;'>
+                            <p style='color: #64748b; font-size: 14px; margin-bottom: 15px;'>Apresente este QR Code diretamente na portaria do evento:</p>
+                            <img src='{urlQrCodeImagem}' alt='QR Code do Ingresso' style='border: 4px solid #fff; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border-radius: 8px; width: 200px; height: 200px;' />
+                        </div>
+
+                        <div style='margin: 40px 0 20px 0;'>
+                            <a href='{urlTicket}' 
+                            style='background-color: #2563eb; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;'>
+                            Imprimir Ingresso em PDF
+                            </a>
+                        </div>
+                        
+                        <hr style='border: none; border-top: 1px solid #e2e8f0; margin: 30px 0;' />
+                        <small style='color: #94a3b8;'>Este é um e-mail automático, por favor não responda.</small>
                     </div>"
             };
 

@@ -12,6 +12,7 @@ import AdminUsuarios from './pages/AdminUsuarios';
 import DetalhesEvento from './pages/DetalhesEvento';
 import Perfil from './pages/Perfil';
 import ConfirmarEmail from './pages/ConfirmarEmail';
+import FormularioPagamento from './pages/FormularioPagamento';
 
 const AdminRoute = ({ children }) => {
   const role = localStorage.getItem('roleUser');
@@ -32,10 +33,8 @@ export default function App() {
       <main className="max-w-7xl mx-auto px-4 mt-8">
         <Routes>
           <Route path="/" element={<ListaEventos />} />
-          <Route path="/evento/:id/inscricao" element={<Inscricao />} />
           <Route path="/ticket/:hash" element={<VisualizarIngresso />} />
           <Route path="/evento/:id" element={<DetalhesEvento />} />
-          
           <Route path="/login" element={<Login />} />
           <Route path="/registrar" element={<Registro />} />
           <Route path="/perfil" element={<Perfil />} />
@@ -66,6 +65,7 @@ export default function App() {
               </AdminRoute>
             } 
           />
+          <Route path="/evento/:id/inscricao" element={<FormularioPagamento />} />
           
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

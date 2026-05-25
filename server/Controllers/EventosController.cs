@@ -33,6 +33,7 @@ namespace PortalEventos.Api.Controllers
                     e.DataAberturaInscricoes,
                     VagasOcupadas = e.Participantes.Count(),
                     Categoria = e.Categoria ?? "Outros",
+                    ValorIngresso = e.ValorIngresso
                 })
                 .ToListAsync();
 
@@ -99,5 +100,8 @@ namespace PortalEventos.Api.Controllers
 
             return NoContent();
         }
+
+        
+
     }
 }

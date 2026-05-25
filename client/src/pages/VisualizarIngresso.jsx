@@ -1,35 +1,21 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api/axiosConfig'; 
 import { QRCodeSVG } from 'qrcode.react';
 
 export default function VisualizarIngresso() {
   const { hash } = useParams();
   const [dados, setDados] = useState(null);
+  const [erro, setErro] = useState(false);
 
   useEffect(() => {
     const carregarDados = async () => {
       try {
-        const res = await axios.get('http://localhost:5065/api/eventos');
-        let encontrado = null;
-
-        for (let evento of res.data) {
-          if (evento.participantes && evento.participantes.length > 0) {
-            const p = evento.participantes.find(part => part.ticketHash === hash);
-            if (p) {
-              encontrado = { 
-                ...p, 
-                nomeEvento: evento.titulo, 
-                dataEvento: evento.data 
-              };
-              break;
-            }
-          }
-        }
-
-        if (encontrado) setDados(encontrado);
+        const res = await api.get(`/participantes/ingresso/${hash}`);
+        setDados(res.data);
       } catch (e) { 
         console.error("Erro na API:", e);
+        setErro(true); 
       }
     };
     carregarDados();
@@ -39,17 +25,24 @@ export default function VisualizarIngresso() {
     window.print();
   };
 
-  if (!dados) return <div className="p-10 text-center text-gray-500">Buscando documento...</div>;
+  if (erro) return <div className="p-10 text-center text-red-500 font-bold mt-20">Ingresso inválido ou não encontrado.</div>;
+  if (!dados) return (
+    <div className="flex flex-col items-center justify-center min-h-[50vh]">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+      <p className="text-gray-500">Buscando documento oficial...</p>
+    </div>
+  );
 
   const urlTicket = `${window.location.origin}/ticket/${hash}`;
+  const isGratuito = dados.valorIngresso === 0;
 
   return (
     <div className="min-h-screen py-10 px-4 flex flex-col items-center print:bg-white print:py-0">
       
       {/* Botões de Ação */}
       <div className="w-full max-w-3xl flex justify-between items-center mb-6 print:hidden">
-        <Link to="/perfil" className="text-gray-500 hover:text-gray-800 font-medium transition">
-          &larr; Voltar
+        <Link to="/" className="text-gray-500 hover:text-gray-800 font-medium transition">
+          &larr; Voltar aos Eventos
         </Link>
         <button 
           onClick={handleImprimir}
@@ -66,7 +59,6 @@ export default function VisualizarIngresso() {
         {/* Cabeçalho Oficial  */}
         <div className="flex justify-between items-start border-b-2 border-gray-900 pb-8 mb-8">
           <div>
-            {/* O Logotipo exigido no topo dos PDFs */}
             <h1 className="text-3xl font-black text-blue-600 tracking-tighter">
               PORTAL<span className="text-gray-900">EVENTOS</span>
             </h1>
@@ -80,8 +72,19 @@ export default function VisualizarIngresso() {
 
         {/* Corpo do Documento */}
         <div className="mb-12">
-          <h2 className="text-xs text-gray-400 uppercase font-bold tracking-widest mb-1">Evento</h2>
-          <p className="text-3xl font-bold text-gray-900 mb-6">{dados.nomeEvento}</p>
+          <div className="flex justify-between items-start mb-6">
+            <div>
+                <h2 className="text-xs text-gray-400 uppercase font-bold tracking-widest mb-1">Evento</h2>
+                <p className="text-3xl font-bold text-gray-900">{dados.nomeEvento}</p>
+            </div>
+            
+            {/* Tag de Preço no PDF */}
+            <div className="text-right">
+                <span className={`px-4 py-2 rounded-full text-sm font-black uppercase tracking-widest border ${isGratuito ? 'bg-green-50 text-green-700 border-green-200' : 'bg-gray-100 text-gray-800 border-gray-300'}`}>
+                    {isGratuito ? 'GRATUITO' : `R$ ${dados.valorIngresso.toFixed(2).replace('.', ',')}`}
+                </span>
+            </div>
+          </div>
           
           <div className="grid grid-cols-2 gap-8 bg-gray-50 p-6 rounded-lg border border-gray-100">
             <div>
@@ -96,7 +99,7 @@ export default function VisualizarIngresso() {
               <p className="text-xs text-gray-400 uppercase font-bold mb-1">Status da Inscrição</p>
               <p className="font-bold text-green-600 flex items-center gap-2">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path></svg>
-                Confirmada
+                Pagamento Aprovado
               </p>
             </div>
           </div>

@@ -111,6 +111,17 @@ export default function DetalhesEvento() {
               <p className="font-medium text-gray-800">{new Date(evento.data).toLocaleString('pt-BR')}</p>
             </div>
           </div>
+
+          <div className="flex items-center gap-2 mb-6">
+            <span className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest border border-blue-100">
+              {evento.categoria || 'Outros'}
+            </span>
+            
+            {/* Tag de Preço */}
+            <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest border ${(evento.valorIngresso ||  0) === 0 ? 'bg-green-50 text-green-700 border-green-200' : 'bg-orange-50 text-orange-700 border-orange-200'}`}>
+              {(evento.valorIngresso || 0) === 0 ? 'Gratuito' : `R$ ${(evento.valorIngresso || 0).toFixed(2).replace('.', ',')}`}
+            </span>
+          </div>
           
           {/* Seção de Vagas e Barra de Progresso */}
           <div className="flex items-center text-gray-600 flex-grow max-w-xs">

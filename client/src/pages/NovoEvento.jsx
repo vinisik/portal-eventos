@@ -14,7 +14,8 @@ export default function NovoEvento() {
         capacidadeMaxima: '',
         imagemUrl: '',   
         idadeMinima: '0',
-        categoria: 'Outros' 
+        categoria: 'Outros',
+        valorIngresso: '0'
     });
 
     const handleChange = (e) => {
@@ -31,6 +32,7 @@ export default function NovoEvento() {
                 ...formData,
                 capacidadeMaxima: parseInt(formData.capacidadeMaxima),
                 idadeMinima: parseInt(formData.idadeMinima),
+                valorIngresso: parseFloat(formData.valorIngresso), 
                 dataAberturaInscricoes: formData.dataAberturaInscricoes || new Date().toISOString()
             });
 
@@ -96,7 +98,7 @@ export default function NovoEvento() {
                     ></textarea>
                 </div>
 
-                {/* Grelha atualizada para 2 colunas para melhor simetria */}
+                {/* Grelha atualizada para acomodar o Preço */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Data e Hora do Evento</label>
@@ -106,6 +108,7 @@ export default function NovoEvento() {
                             className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 outline-none transition"
                         />
                     </div>
+                    
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Abertura das Inscrições</label>
                         <input
@@ -114,6 +117,18 @@ export default function NovoEvento() {
                             className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 outline-none transition"
                         />
                         <p className="text-[10px] text-gray-400 mt-1">Deixe em branco para abrir imediatamente.</p>
+                    </div>
+
+                    {/*  Preço do Ingresso */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Preço do Ingresso (R$)</label>
+                        <input
+                            type="number" min="0" step="0.01" required name="valorIngresso"
+                            value={formData.valorIngresso} onChange={handleChange}
+                            className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 outline-none transition"
+                            placeholder="0,00"
+                        />
+                        <p className="text-[10px] text-gray-400 mt-1">Deixe 0 para eventos gratuitos.</p>
                     </div>
 
                     <div>
@@ -141,7 +156,7 @@ export default function NovoEvento() {
                     </div>
 
                     {/* Seleção de Categoria */}
-                    <div className="md:col-span-2">
+                    <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Categoria do Evento</label>
                         <select 
                             name="categoria" value={formData.categoria} onChange={handleChange}

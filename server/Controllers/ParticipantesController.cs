@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PortalEventos.Api.Data;
@@ -69,10 +70,38 @@ namespace PortalEventos.Api.Controllers
             await _context.SaveChangesAsync();
 
             // Disparo do e-mail de confirmação
-            _ = _emailService.EnviarIngressoAsync(user.Email, user.Nome, evento.Titulo);
+            await _emailService.EnviarIngressoAsync(
+                user.Email,
+                user.Nome,
+                evento.Titulo,
+                user.TicketHash, 
+                evento.ValorIngresso 
+            );
 
             // Retorna os dados do usuário inscrito 
             return Ok(user);
+        }
+
+        [AllowAnonymous] 
+        [HttpGet("ingresso/{hash}")]
+        public async Task<IActionResult> GetIngressoPorHash(string hash)
+        {
+            var participante = await _context.Participantes
+                .Include(p => p.Evento) 
+                .FirstOrDefaultAsync(p => p.TicketHash == hash);
+
+            if (participante == null) 
+                return NotFound("Ingresso não encontrado.");
+
+            // Devolve apenas os dados necessários para o PDF
+            return Ok(new {
+                nome = participante.Nome,
+                email = participante.Email,
+                ticketHash = participante.TicketHash,
+                nomeEvento = participante.Evento.Titulo,
+                dataEvento = participante.Evento.Data,
+                valorIngresso = participante.Evento.ValorIngresso
+            });
         }
     }
 }
