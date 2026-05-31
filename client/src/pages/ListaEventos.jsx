@@ -10,7 +10,7 @@ export default function ListaEventos() {
   const [categoriaAtiva, setCategoriaAtiva] = useState('Todas');
   const [mostrarFiltros, setMostrarFiltros] = useState(false);
   
-  const categorias = ['Todas', 'Tecnologia', 'Negócios', 'Música', 'Educação', 'Esportes', 'Cultura' , 'Outros'];
+  const categorias = ['Todas', 'Tecnologia', 'Negócios', 'Música', 'Educação', 'Esportes', 'Cultura' , 'Outros', 'afasfasf'];
   const isAdmin = localStorage.getItem('roleUser') === 'Admin';
 
   useEffect(() => {
@@ -20,7 +20,7 @@ export default function ListaEventos() {
   const buscarEventos = async () => {
     try {
       const response = await axios.get('http://localhost:5065/api/eventos');
-      // Ordenação: Organiza por data de forma decrescente (mais recente primeiro)
+      // Organiza por data de forma decrescente
       const eventosOrdenados = response.data.sort((a, b) => new Date(b.data) - new Date(a.data));
       setEventos(eventosOrdenados);
     } catch (error) {
@@ -69,7 +69,7 @@ export default function ListaEventos() {
   const eventoDestaque = eventos.find(e => e.destaque === true || e.Destaque === true);
 
   const eventosFiltrados = eventos.filter(evento => {
-    // Esconde o destaque da grelha se o banner já estiver a ser exibido
+    // Esconde o destaque do grid se o banner já estiver sendo exibido e nenhum filtro estiver ativo
     if (semFiltrosAtivos && eventoDestaque && evento.id === eventoDestaque.id) return false;
 
     const termoLower = termoBusca.toLowerCase();

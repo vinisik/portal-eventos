@@ -17,8 +17,8 @@ export default function EditarEvento() {
     imagemUrl: '',    
     idadeMinima: '0',
     categoria: 'Outros',
-    valorIngresso: '0', // 👇 Adicionado para não perder o preço na edição
-    destaque: false     // 👇 Adicionado para o Destaque
+    valorIngresso: '0', 
+    destaque: false   
   });
 
   useEffect(() => {

@@ -58,7 +58,7 @@ namespace PortalEventos.Api.Services
             // Lógica para formatação do preço
             string valorFormatado = valorIngresso == 0 ? "GRATUITO" : $"R$ {valorIngresso:F2}";
             
-            // URL do ingresso no seu React
+            // URL do ingresso no React
             string urlTicket = $"http://localhost:5173/ticket/{ticketHash}";
             
             // URL da imagem gerada dinamicamente pelo QR Server
@@ -116,7 +116,6 @@ namespace PortalEventos.Api.Services
             }
             catch (Exception ex)
             {
-                // Num ambiente de produção, isto seria gravado no Serilog/ILogger
                 Console.WriteLine($"Falha no envio de e-mail SMTP: {ex.Message}");
             }
         }

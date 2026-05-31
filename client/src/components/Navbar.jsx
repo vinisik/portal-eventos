@@ -45,7 +45,7 @@ export default function Navbar() {
                 {/* Info do Usuário */}
                 <div className="flex items-center gap-4 border-l border-gray-200 pl-6 ml-2">
                   
-                  {/* Link para a página de perfil/ingressos do usuário */}
+                  {/* Link para a página de ingressos do usuário */}
                   {perfil !== 'Admin' && (
                     <Link 
                       to="/perfil" 

@@ -51,7 +51,7 @@ export default function FormularioPagamento() {
     return () => clearInterval(intervalo);
   }, [metodoPagamento, tempoPix, processandoPagamento]);
 
-  // Formatador do Tempo do PIX (MM:SS)
+  // Formatador do Tempo do PIX 
   const formatarTempo = (segundos) => {
     const min = Math.floor(segundos / 60);
     const seg = segundos % 60;
@@ -62,7 +62,7 @@ export default function FormularioPagamento() {
   const handleCopiarPix = () => {
     navigator.clipboard.writeText(chavePixFicticia);
     setChaveCopiada(true);
-    setTimeout(() => setChaveCopiada(false), 2000); // Volta ao normal após 2s
+    setTimeout(() => setChaveCopiada(false), 2000); 
   };
 
   // Funções de Máscara do Cartão
@@ -83,11 +83,11 @@ export default function FormularioPagamento() {
     setCvv(valor);
   };
 
-  // Submissão Final para a API
+  // Envio do Formulário de Pagamento
   const finalizarInscricao = async () => {
     setProcessandoPagamento(true);
     
-    // Simula o tempo de rede/processamento bancário
+    // Simula o tempo de processamento bancário
     if (evento.valorIngresso > 0) {
       await new Promise(resolve => setTimeout(resolve, 2000));
     }

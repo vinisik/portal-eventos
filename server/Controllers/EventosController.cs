@@ -134,44 +134,43 @@ namespace PortalEventos.Api.Controllers
             return NoContent();
         }
 
-        [HttpGet("gerar-teste")]
-        public async Task<IActionResult> GerarEventosTeste()
-        {
-            var random = new Random();
-            var categorias = new[] { "Tecnologia", "Negócios", "Música", "Educação", "Esportes", "Cultura" };
-            var eventos = new List<Evento>();
+        // [HttpGet("gerar-teste")]
+        // public async Task<IActionResult> GerarEventosTeste()
+        // {
+        //     var random = new Random();
+        //     var categorias = new[] { "Tecnologia", "Negócios", "Música", "Educação", "Esportes", "Cultura" };
+        //     var eventos = new List<Evento>();
 
-            for (int i = 1; i <= 12; i++) 
-            {
-                bool isGratuito = random.Next(100) < 30; 
+        //     for (int i = 1; i <= 12; i++) 
+        //     {
+        //         bool isGratuito = random.Next(100) < 30; 
                 
-                decimal valorAleatorio = isGratuito ? 0 : (decimal)(random.Next(20, 150) + random.NextDouble());
+        //         decimal valorAleatorio = isGratuito ? 0 : (decimal)(random.Next(20, 150) + random.NextDouble());
 
-                var evento = new Evento
-                {
-                    Titulo = $"Evento de Teste #{random.Next(1000, 9999)}",
-                    Descricao = "Esta é uma descrição gerada automaticamente pelo script de testes. O evento abordará temas fantásticos com palestrantes de renome internacional.\n\nContamos com a sua presença!",
-                    Data = DateTime.Now.AddDays(random.Next(5, 60)), 
-                    DataAberturaInscricoes = DateTime.Now.AddDays(-random.Next(1, 10)), 
-                    CapacidadeMaxima = random.Next(20, 500), 
-                    IdadeMinima = random.Next(100) < 40 ? 18 : 0, 
-                    Categoria = categorias[random.Next(categorias.Length)],
-                    ValorIngresso = Math.Round(valorAleatorio, 2), 
+        //         var evento = new Evento
+        //         {
+        //             Titulo = $"Evento de Teste #{random.Next(1000, 9999)}",
+        //             Descricao = "Esta é uma descrição gerada automaticamente pelo script de testes. O evento abordará temas fantásticos com palestrantes de renome internacional.\n\nContamos com a sua presença!",
+        //             Data = DateTime.Now.AddDays(random.Next(5, 60)), 
+        //             DataAberturaInscricoes = DateTime.Now.AddDays(-random.Next(1, 10)), 
+        //             CapacidadeMaxima = random.Next(20, 500), 
+        //             IdadeMinima = random.Next(100) < 40 ? 18 : 0, 
+        //             Categoria = categorias[random.Next(categorias.Length)],
+        //             ValorIngresso = Math.Round(valorAleatorio, 2), 
                     
-                    ImagemUrl = $"https://picsum.photos/seed/{random.Next(1, 99999)}/800/400"
-                };
+        //             ImagemUrl = $"https://picsum.photos/seed/{random.Next(1, 99999)}/800/400"
+        //         };
 
-                eventos.Add(evento);
-            }
+        //         eventos.Add(evento);
+        //     }
 
-            _context.Eventos.AddRange(eventos);
-            await _context.SaveChangesAsync();
+        //     _context.Eventos.AddRange(eventos);
+        //     await _context.SaveChangesAsync();
 
-            return Ok(new { 
-                mensagem = "Sucesso! 12 eventos aleatórios foram criados.", 
-                quantidade = eventos.Count 
-            });
-        }
-
+        //     return Ok(new { 
+        //         mensagem = "Sucesso! 12 eventos aleatórios foram criados.", 
+        //         quantidade = eventos.Count 
+        //     });
+        // }
     }
 }
